@@ -14,12 +14,12 @@ fun AccountBalance(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "\$10,356.25", style = MaterialTheme.typography.displayLarge,
+            "\$10,356.25", style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onPrimary,
         )
         Text(
             "Account Balance",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimary,
         )
     }

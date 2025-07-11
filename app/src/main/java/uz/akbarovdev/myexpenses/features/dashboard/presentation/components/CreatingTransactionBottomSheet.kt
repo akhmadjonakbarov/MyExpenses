@@ -49,14 +49,19 @@ import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryButton
 import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryIconButton
 import uz.akbarovdev.myexpenses.core.design_system.text_fields.TransparentBasicTextField
+import uz.akbarovdev.myexpenses.core.enums.TransactionType
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
 import uz.akbarovdev.myexpenses.ui.theme.OnPrimaryFixed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatingTransactionBottomSheetWrapper(
-    sheetState: SheetState,
-    onDismiss: () -> Unit
-) {
+    state: DashboardState,
+    onAction: (DashboardAction) -> Unit,
+    onDismiss: () -> Unit,
+
+    ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -65,7 +70,9 @@ fun CreatingTransactionBottomSheetWrapper(
         onDismissRequest = onDismiss,
     ) {
         CreatingTransactionBottomSheet(
-            onDismiss = onDismiss
+            onDismiss = onDismiss,
+            state = state,
+            onAction = onAction,
         )
     }
 }
@@ -76,8 +83,10 @@ fun CreatingTransactionBottomSheetWrapper(
 fun CreatingTransactionBottomSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
+    state: DashboardState,
+    onAction: (DashboardAction) -> Unit,
 ) {
-    var currentButton by remember { mutableStateOf("expense") }
+
 
     Column(
         modifier = modifier
@@ -120,20 +129,27 @@ fun CreatingTransactionBottomSheet(
             TabButton(
                 modifier = Modifier.weight(0.5f),
                 onClick = {
-
-                    currentButton = "expense"
+                    onAction(
+                        DashboardAction.OnChangeTransactionType(
+                            TransactionType.Expense
+                        )
+                    )
                 },
                 text = "Expense",
-                isSelected = currentButton == "expense"
+                isSelected = state.transactionType == TransactionType.Expense
             )
             Spacer(Modifier.width(5.dp))
             TabButton(
                 modifier = Modifier.weight(0.5f),
                 onClick = {
-                    currentButton = "income"
+                    onAction(
+                        DashboardAction.OnChangeTransactionType(
+                            TransactionType.Income
+                        )
+                    )
                 },
                 text = "Income",
-                isSelected = currentButton == "income"
+                isSelected = state.transactionType == TransactionType.Income
             )
         }
         Spacer(
@@ -144,11 +160,17 @@ fun CreatingTransactionBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            var text by remember { mutableStateOf("") }
+
 
             TransparentBasicTextField(
-                text = "",
-                onValueChange = {},
+                text = state.receiverText,
+                onValueChange = {
+                    onAction(
+                        DashboardAction.OnReceiverInputChange(
+                            it
+                        )
+                    )
+                },
                 hintText = "Receiver"
             )
             Row(
@@ -181,7 +203,7 @@ fun CreatingTransactionBottomSheet(
 
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    if (text.isEmpty()) {
+                    if (state.amountText.isEmpty()) {
                         Text(
                             text = "00.00",
                             style = MaterialTheme.typography.displayMedium,
@@ -190,8 +212,14 @@ fun CreatingTransactionBottomSheet(
                     }
 
                     BasicTextField(
-                        value = text,
-                        onValueChange = {},
+                        value = state.amountText,
+                        onValueChange = {
+                            onAction(
+                                DashboardAction.OnAmountInputChange(
+                                    it
+                                )
+                            )
+                        },
                         textStyle = MaterialTheme.typography.displayMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface
                         ),
@@ -201,8 +229,14 @@ fun CreatingTransactionBottomSheet(
 
             TransparentBasicTextField(
                 hintText = "+ Add Note",
-                text = text,
-                onValueChange = {}
+                text = state.noteText,
+                onValueChange = {
+                    onAction(
+                        DashboardAction.OnNoteInputChange(
+                            it
+                        )
+                    )
+                }
             )
         }
         Spacer(Modifier.height(15.dp))
@@ -211,7 +245,11 @@ fun CreatingTransactionBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(45.dp),
-            onClick = {}
+            onClick = {
+                onAction(
+                    DashboardAction.OnCreateTransaction
+                )
+            }
         ) {
             Text("Create", style = MaterialTheme.typography.titleMedium)
         }
@@ -270,6 +308,8 @@ private fun CreatingTransactionBottomSheetPreview() {
     })
     val scope = rememberCoroutineScope()
     CreatingTransactionBottomSheet(
-        onDismiss = {}
+        onDismiss = {}, state = DashboardState(),
+        onAction = {}
+
     )
 }

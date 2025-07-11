@@ -44,7 +44,7 @@ fun TransparentBasicTextField(
             onValueChange = onValueChange,
             textStyle = MaterialTheme.typography.titleMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center // 👈 Center-align text
+                textAlign = TextAlign.Center
             ),
 
             modifier = Modifier

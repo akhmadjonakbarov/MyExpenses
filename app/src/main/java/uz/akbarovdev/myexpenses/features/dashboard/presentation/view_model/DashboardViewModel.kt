@@ -31,11 +31,35 @@ class DashboardViewModel : ViewModel() {
             is DashboardAction.OpenCreateTransactionBottomSheet -> {
                 _state.update {
                     it.copy(
-                        manageCreatingTransactionBottomSheet = action.manageValue,
+                        manageCreatingTransactionBottomSheet = action.isVisible,
                     )
                 }
             }
+
+            is DashboardAction.OnAmountInputChange -> {
+                _state.update { it.copy(amountText = action.amount) }
+            }
+
+            is DashboardAction.OnChangeTransactionType -> {
+                _state.update {
+                    it.copy(transactionType = action.transactionType)
+                }
+            }
+
+            DashboardAction.OnCreateTransaction -> createTransaction()
+            is DashboardAction.OnNoteInputChange -> {
+                _state.update { it.copy(noteText = action.note) }
+            }
+
+            is DashboardAction.OnReceiverInputChange -> {
+                _state.update { it.copy(receiverText = action.receiver) }
+            }
         }
+    }
+
+
+    private fun createTransaction() {
+
     }
 
 }
