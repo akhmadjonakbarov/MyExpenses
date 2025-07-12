@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 
 class DashboardViewModel : ViewModel() {
 
@@ -46,7 +47,10 @@ class DashboardViewModel : ViewModel() {
                 }
             }
 
-            DashboardAction.OnCreateTransaction -> createTransaction()
+            DashboardAction.OnCreateTransaction -> {
+                createTransaction()
+            }
+
             is DashboardAction.OnNoteInputChange -> {
                 _state.update { it.copy(noteText = action.note) }
             }
@@ -54,12 +58,21 @@ class DashboardViewModel : ViewModel() {
             is DashboardAction.OnReceiverInputChange -> {
                 _state.update { it.copy(receiverText = action.receiver) }
             }
+
+            is DashboardAction.OnSelectCategory -> selectCategory(action.categoryUi)
         }
     }
 
 
     private fun createTransaction() {
+    }
 
+    private fun selectCategory(categoryUi: CategoryUi) {
+        _state.update {
+            it.copy(
+                selectedCategoryUi = categoryUi
+            )
+        }
     }
 
 }
