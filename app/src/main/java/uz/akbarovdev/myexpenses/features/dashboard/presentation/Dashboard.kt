@@ -1,5 +1,6 @@
 package uz.akbarovdev.myexpenses.features.dashboard.presentation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -135,9 +137,16 @@ fun DashboardScreen(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Spacer(
-                        Modifier.height(5.dp)
+                        Modifier.height(10.dp)
                     )
-                    TransactionItem()
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp) // ⬅️ space between items
+                    ) {
+                        items(10) {
+                            TransactionItem()
+                        }
+                    }
                 }
             }
         }
