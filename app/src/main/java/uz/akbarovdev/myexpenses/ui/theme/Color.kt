@@ -18,6 +18,7 @@ val OnPrimaryFixed = Color(0xFF24005A)
 val SecondaryContainer = Color(0xFFD2E750)
 val SecondaryFixed = Color(0xFFE5EA58)
 
+val SurfaceContainerLowest = Color(0xFFFFFFFF)
 val OnSurface = Color(0xFF1B1B1C)
 
 val Outline = Color(0xFF75777B)
