@@ -172,6 +172,8 @@ private fun Preview() {
         DashboardScreen(
             state = DashboardState(
                 manageCreatingTransactionBottomSheet = false
-            ), onAction = {})
+            ),
+            onAction = {},
+        )
     }
 }
