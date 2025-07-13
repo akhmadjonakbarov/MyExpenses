@@ -11,11 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryIconButton
 
 @Composable
-fun DashboardHeader(modifier: Modifier = Modifier) {
+fun DashboardHeader(
+    goSettingsClick: () -> Unit,
+    exportClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -31,13 +36,13 @@ fun DashboardHeader(modifier: Modifier = Modifier) {
         ) {
             PrimaryIconButton(
                 imageVector = ImageVector.vectorResource(R.drawable.download_icon),
-                contentDescription = "Download Icon",
-                onClick = {},
+                contentDescription = "Download",
+                onClick = exportClick,
             )
             PrimaryIconButton(
                 imageVector = ImageVector.vectorResource(R.drawable.settings),
-                contentDescription = "Download Icon",
-                onClick = {},
+                contentDescription = "Settings",
+                onClick = goSettingsClick,
             )
         }
     }

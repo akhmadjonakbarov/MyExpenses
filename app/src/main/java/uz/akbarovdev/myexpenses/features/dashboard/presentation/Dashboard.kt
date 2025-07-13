@@ -1,6 +1,6 @@
 package uz.akbarovdev.myexpenses.features.dashboard.presentation
 
-import androidx.compose.animation.AnimatedVisibility
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AccountBalance
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.CreatingTransactionBottomSheetWrapper
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DashboardHeader
@@ -42,18 +45,21 @@ import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 
 @Composable
 fun DashboardRoot(
+    navController: NavController,
     viewModel: DashboardViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     DashboardScreen(
-        state = state, onAction = viewModel::onAction
+        state = state, onAction = viewModel::onAction,
+        navController = navController
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    navController: NavController,
     state: DashboardState,
     onAction: (DashboardAction) -> Unit,
 ) {
@@ -91,7 +97,12 @@ fun DashboardScreen(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DashboardHeader()
+                    DashboardHeader(
+                        goSettingsClick = {
+                            navController.navigate(NavigationRoutes.Settings)
+                        },
+                        exportClick = {}
+                    )
                     AccountBalance()
                     TransactionInfo()
                 }
@@ -154,7 +165,6 @@ fun DashboardScreen(
 
     if (state.manageCreatingTransactionBottomSheet) {
         CreatingTransactionBottomSheetWrapper(
-
             onDismiss = {
                 onAction(
                     DashboardAction.OpenCreateTransactionBottomSheet(false),
@@ -174,6 +184,7 @@ private fun Preview() {
                 manageCreatingTransactionBottomSheet = false
             ),
             onAction = {},
+            navController = rememberNavController()
         )
     }
 }
