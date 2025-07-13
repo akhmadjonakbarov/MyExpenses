@@ -1,4 +1,4 @@
-package uz.akbarovdev.myexpenses.features.settings
+package uz.akbarovdev.myexpenses.features.settings.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
