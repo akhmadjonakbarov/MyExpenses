@@ -22,10 +22,9 @@ fun TransparentBasicTextField(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp), // optional for spacing
+            .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        // Placeholder
         if (text.isEmpty()) {
             Text(
                 text = hintText,
@@ -38,7 +37,6 @@ fun TransparentBasicTextField(
             )
         }
 
-        // Actual TextField
         BasicTextField(
             value = text,
             onValueChange = onValueChange,
@@ -46,7 +44,6 @@ fun TransparentBasicTextField(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             ),
-
             modifier = Modifier
                 .fillMaxWidth(),
             singleLine = true
