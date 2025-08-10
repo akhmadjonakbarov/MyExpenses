@@ -21,6 +21,7 @@ val SecondaryFixed = Color(0xFFE5EA58)
 val SurfaceContainerLowest = Color(0xFFFFFFFF)
 val SurfaceContainerLow = Color(0xFFF6F3F3)
 val OnSurface = Color(0xFF1B1B1C)
+val OnSurfaceVariant = Color(0xFF44474B)
 
 val Success = Color(0xFF29AC08)
 

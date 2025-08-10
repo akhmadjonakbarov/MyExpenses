@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,8 +36,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
+import uz.akbarovdev.myexpenses.core.design_system.common_components.CreatingTransactionBottomSheet
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AccountBalance
-import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.CreatingTransactionBottomSheetWrapper
+import uz.akbarovdev.myexpenses.core.design_system.common_components.CreatingTransactionBottomSheetWrapper
+import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DashboardHeader
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.FloatButton
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionInfo
@@ -101,7 +107,9 @@ fun DashboardScreen(
                         goSettingsClick = {
                             navController.navigate(NavigationRoutes.Settings)
                         },
-                        exportClick = {}
+                        exportClick = {
+                            onAction(DashboardAction.OnShowExportBottomSheet)
+                        }
                     )
                     AccountBalance()
                     TransactionInfo()
@@ -134,8 +142,12 @@ fun DashboardScreen(
                         Text(
                             "Latest Transaction", style = MaterialTheme.typography.titleLarge
                         )
+                        // TODO: if transactions don't exist, hide the button
                         TextButton(
-                            onClick = {}) {
+                            onClick = {
+                                navController.navigate(NavigationRoutes.Transactions)
+                            },
+                        ) {
                             Text(
                                 "Show all",
                                 style = MaterialTheme.typography.titleMedium,
@@ -143,21 +155,34 @@ fun DashboardScreen(
                             )
                         }
                     }
-                    Text(
-                        "Today",
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    Spacer(
-                        Modifier.height(10.dp)
-                    )
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp) // ⬅️ space between items
-                    ) {
-                        items(10) {
-                            TransactionItem()
+                    when {
+                        state.transactions.isEmpty() -> {
+                            Box(
+                                Modifier.fillMaxSize()
+                            ) {
+                                NoTransaction()
+                            }
+                        }
+
+                        else -> {
+                            Text(
+                                "Today",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Spacer(
+                                Modifier.height(10.dp)
+                            )
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(10) {
+                                    TransactionItem()
+                                }
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -172,6 +197,45 @@ fun DashboardScreen(
             }, state = state, onAction = onAction
         )
     }
+    if (state.exportBottomSheet) {
+        ModalBottomSheet(
+
+            sheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true
+            ),
+            onDismissRequest = {
+                onAction(DashboardAction.OnShowExportBottomSheet)
+            },
+
+            ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Column(
+                    Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "Export",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.W600,
+                        )
+                    )
+                    Text(
+                        "Export transactions to CSV format",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.W400,
+                        )
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                ExposedDropdownMenuBox(expanded = true, onExpandedChange = {}) {
+                    
+                }
+            }
+        }
+    }
 }
 
 
@@ -181,7 +245,7 @@ private fun Preview() {
     MyExpensesTheme {
         DashboardScreen(
             state = DashboardState(
-                manageCreatingTransactionBottomSheet = false
+
             ),
             onAction = {},
             navController = rememberNavController()

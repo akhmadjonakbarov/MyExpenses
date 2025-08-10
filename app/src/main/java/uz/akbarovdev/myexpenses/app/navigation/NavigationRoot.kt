@@ -6,7 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.DashboardRoot
+import uz.akbarovdev.myexpenses.features.preference.PreferenceRoot
 import uz.akbarovdev.myexpenses.features.settings.SettingsRoot
+import uz.akbarovdev.myexpenses.features.transactions.TransactionsRoot
 
 @Composable
 fun NavigationRoot(
@@ -17,12 +19,16 @@ fun NavigationRoot(
         startDestination = NavigationRoutes.Dashboard
     ) {
         composable<NavigationRoutes.Dashboard> {
-            DashboardRoot(
-                navController
-            )
+            DashboardRoot(navController)
         }
         composable<NavigationRoutes.Settings> {
-            SettingsRoot()
+            SettingsRoot(navController)
+        }
+        composable<NavigationRoutes.Transactions> {
+            TransactionsRoot(navController)
+        }
+        composable<NavigationRoutes.Preference> {
+            PreferenceRoot()
         }
     }
 

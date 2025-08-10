@@ -1,5 +1,6 @@
 package uz.akbarovdev.myexpenses.features.settings.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,10 +26,13 @@ fun MenuItem(
     iconColor: Color = LocalContentColor.current,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
     style: TextStyle = MaterialTheme.typography.labelLarge,
-    textColor: Color = MaterialTheme.colorScheme.onSurface
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier.fillMaxWidth(),
+        modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconBox(

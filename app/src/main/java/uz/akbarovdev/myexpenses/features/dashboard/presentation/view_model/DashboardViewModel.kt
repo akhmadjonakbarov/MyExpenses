@@ -60,6 +60,14 @@ class DashboardViewModel : ViewModel() {
             }
 
             is DashboardAction.OnSelectCategory -> selectCategory(action.categoryUi)
+            DashboardAction.OnShowExportBottomSheet -> {
+                val visible = state.value.exportBottomSheet
+                _state.update {
+                    it.copy(
+                        exportBottomSheet = !visible
+                    )
+                }
+            }
         }
     }
 

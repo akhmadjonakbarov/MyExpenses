@@ -35,6 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
+import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
 import uz.akbarovdev.myexpenses.features.settings.components.MenuItem
 import uz.akbarovdev.myexpenses.features.settings.view_model.SettingsAction
 import uz.akbarovdev.myexpenses.features.settings.view_model.SettingsState
@@ -54,6 +56,7 @@ fun SettingsRoot(
         navController = navController
     )
 }
+
 
 @Composable
 fun SettingsScreen(
@@ -77,9 +80,8 @@ fun SettingsScreen(
                     }
                 },
                 title = {
-                    Text(
-                        "Settings",
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
+                    Title(
+                        title = "Settings",
                     )
                 }
             )
@@ -105,6 +107,7 @@ fun SettingsScreen(
                         icon = Icons.Outlined.Settings,
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                         text = "Preference",
+                        onClick = { navController.navigate(NavigationRoutes.Preference) }
                     )
 
                     Spacer(
@@ -116,6 +119,7 @@ fun SettingsScreen(
                         icon = Icons.Default.Lock,
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                         text = "Security",
+                        onClick = { navController.navigate(NavigationRoutes.Preference) }
                     )
                 }
             }
@@ -125,7 +129,6 @@ fun SettingsScreen(
                     10.dp
                 )
             )
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,7 +142,8 @@ fun SettingsScreen(
                     icon = Icons.Default.ExitToApp,
                     text = "Log out",
                     containerColor = MaterialTheme.colorScheme.error.copy(0.08f),
-                    textColor = MaterialTheme.colorScheme.error
+                    textColor = MaterialTheme.colorScheme.error,
+                    onClick = { navController.navigate(NavigationRoutes.Preference) }
                 )
             }
         }

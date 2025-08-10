@@ -36,7 +36,6 @@ fun TransparentBasicTextField(
                     .align(Alignment.Center)
             )
         }
-
         BasicTextField(
             value = text,
             onValueChange = onValueChange,

@@ -14,4 +14,5 @@ sealed interface DashboardAction {
     data class OnChangeTransactionType(val transactionType: TransactionType) : DashboardAction
     data object OnCreateTransaction : DashboardAction
     data class OnSelectCategory(val categoryUi: CategoryUi) : DashboardAction
+    data object OnShowExportBottomSheet : DashboardAction
 }

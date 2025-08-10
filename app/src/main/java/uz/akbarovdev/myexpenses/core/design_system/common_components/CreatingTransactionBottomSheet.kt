@@ -1,19 +1,16 @@
-package uz.akbarovdev.myexpenses.features.dashboard.presentation.components
+package uz.akbarovdev.myexpenses.core.design_system.common_components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -37,6 +34,8 @@ import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryButton
 import uz.akbarovdev.myexpenses.core.design_system.text_fields.TransparentBasicTextField
 import uz.akbarovdev.myexpenses.core.enums.TransactionType
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AmountInputTextField
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.CategoryDropdown
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
 import uz.akbarovdev.myexpenses.ui.theme.OnPrimaryFixed
@@ -48,8 +47,7 @@ fun CreatingTransactionBottomSheetWrapper(
     state: DashboardState,
     onAction: (DashboardAction) -> Unit,
     onDismiss: () -> Unit,
-
-    ) {
+) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
