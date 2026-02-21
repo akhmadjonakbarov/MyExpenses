@@ -25,11 +25,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
         }
     }
     compileOptions {
@@ -41,6 +43,11 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 }
 
@@ -68,8 +75,6 @@ dependencies {
 
     // DI - Koin
     implementation(libs.bundles.koin)
-
-
 
 
     // Gif
@@ -100,7 +105,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     // JUnit Jupiter
-    testImplementation(  libs.junit.jupiter.api) // Or the latest stable version
+    testImplementation(libs.junit.jupiter.api) // Or the latest stable version
     testRuntimeOnly(libs.junit.jupiter.engine) // Or the latest stable version
     testImplementation(libs.junit.jupiter.params) // For parameterized tests (optional)
     testImplementation(libs.assertk)
