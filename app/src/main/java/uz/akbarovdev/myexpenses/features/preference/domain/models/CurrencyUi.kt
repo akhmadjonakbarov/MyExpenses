@@ -1,7 +1,7 @@
 package uz.akbarovdev.myexpenses.features.preference.domain.models
 
 enum class CurrencyUi(
-    val shorter: String,
+    val code: String,
     val label: String,
 ) {
     USD("USD", "Dollar"),

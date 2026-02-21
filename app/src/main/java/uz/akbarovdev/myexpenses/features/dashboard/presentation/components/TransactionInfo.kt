@@ -17,12 +17,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
 import uz.akbarovdev.myexpenses.ui.theme.PrimaryFixed
 import uz.akbarovdev.myexpenses.ui.theme.SecondaryFixed
 
 @Composable
-fun TransactionInfo(modifier: Modifier = Modifier) {
+fun TransactionInfo(
+    state: DashboardState,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -30,6 +37,7 @@ fun TransactionInfo(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -49,13 +57,28 @@ fun TransactionInfo(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Adobe Yearly",
-                        style = MaterialTheme.typography.titleLarge,
+                        state.largestTransactionUi?.receiver ?: "",
+                        style = MaterialTheme.typography.titleMedium,
                     )
-                    Text(
-                        "-\$59.99",
-                        style = MaterialTheme.typography.titleLarge,
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (state.largestTransactionUi != null)
+                            Text(
+                                "${state.largestTransactionUi?.amount}",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        else
+                            Text(
+                                "${0.0}",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        Text(
+                            "${state.selectedCurrencyUi.code}",
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
                 }
 
                 Row(
@@ -75,13 +98,13 @@ fun TransactionInfo(modifier: Modifier = Modifier) {
         }
         Spacer(
             Modifier.width(
-                10.dp,
+                5.dp,
             )
         )
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(0.3f)
+                .weight(0.4f)
                 .background(
                     color = SecondaryFixed, shape = RoundedCornerShape(
                         15.dp,
@@ -96,10 +119,21 @@ fun TransactionInfo(modifier: Modifier = Modifier) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Text(
-                    "-\$765.20",
-                    style = MaterialTheme.typography.titleLarge,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+
+                    Text(
+                        "${state.totalPreviewWeekTransaction}",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        "${state.selectedCurrencyUi.code}",
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                }
 
                 Text(
                     "Previous week",
@@ -108,4 +142,21 @@ fun TransactionInfo(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun TransactionInfoPreview() {
+    TransactionInfo(
+        state = DashboardState(
+            largestTransactionUi = TransactionUi(
+                amount = 2500000.0,
+                icon = CategoryUi.ENTERTAINMENT,
+                note = "for debt",
+                receiver = "Akmal",
+                id = 1,
+
+                )
+        )
+    )
 }

@@ -28,7 +28,7 @@ fun NavigationRoot(
             TransactionsRoot(navController)
         }
         composable<NavigationRoutes.Preference> {
-            PreferenceRoot()
+            PreferenceRoot(navController)
         }
     }
 

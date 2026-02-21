@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import uz.akbarovdev.myexpenses.core.design_system.common_components.IconBox
+import uz.akbarovdev.myexpenses.core.design_system.common_components.IconLabelBox
 
 @Composable
 fun MenuItem(
@@ -35,7 +35,7 @@ fun MenuItem(
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconBox(
+        IconLabelBox(
             modifier = Modifier.size(40.dp),
             icon = icon,
             iconSize = 25.dp,

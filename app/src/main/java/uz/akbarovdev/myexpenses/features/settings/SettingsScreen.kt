@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
 import uz.akbarovdev.myexpenses.features.settings.components.MenuItem
@@ -46,7 +47,7 @@ import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 @Composable
 fun SettingsRoot(
     navController: NavController,
-    viewModel: SettingsViewModel = viewModel()
+    viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

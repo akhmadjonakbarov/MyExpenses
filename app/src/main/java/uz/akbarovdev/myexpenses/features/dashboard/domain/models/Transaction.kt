@@ -7,8 +7,19 @@ data class TransactionGroup(
     val transactions: List<Transaction> = emptyList()
 )
 
+data class TransactionUi(
+    val id:Int,
+    val icon: CategoryUi,
+    val amount: Double = 0.0,
+    val type: String = "",
+    val note: String = "",
+    val receiver: String = "",
+)
+
 data class Transaction(
-    val icon: String = "✅",
-    val name: String = "",
-    val price: Double = 0.0,
+    val amount: Double = 0.0,
+    val type: String = "",
+    val note: String = "",
+    val receiver: String = "",
+    val category: String = ""
 )

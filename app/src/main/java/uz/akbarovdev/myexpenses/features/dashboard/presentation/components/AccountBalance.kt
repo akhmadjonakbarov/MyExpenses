@@ -15,10 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 
 @Composable
-fun AccountBalance(modifier: Modifier = Modifier) {
+fun AccountBalance(
+    balance: Double = 0.0,
+    currencyUi: CurrencyUi,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -28,7 +32,7 @@ fun AccountBalance(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                "10,356.25", style = MaterialTheme.typography.displayMedium,
+                "$balance", style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
 
                 )
@@ -37,7 +41,7 @@ fun AccountBalance(modifier: Modifier = Modifier) {
             )
             Text(
                 modifier = Modifier.padding(bottom = 5.dp),
-                text = "UZS", style = MaterialTheme.typography.titleLarge,
+                text = currencyUi.code, style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary,
             )
@@ -51,9 +55,14 @@ fun AccountBalance(modifier: Modifier = Modifier) {
 }
 
 
-@Preview()
+@Preview(
+    showBackground = false,
+)
 @Composable
 private fun AccountBalancePreview() {
-    AccountBalance()
+    AccountBalance(
+        balance = 10000.0,
+        currencyUi = CurrencyUi.UZS
+    )
 
 }

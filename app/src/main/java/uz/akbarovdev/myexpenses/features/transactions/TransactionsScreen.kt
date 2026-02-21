@@ -8,14 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.BackButton
 import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
@@ -43,7 +41,7 @@ import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 @Composable
 fun TransactionsRoot(
     navController: NavController,
-    viewModel: DashboardViewModel = viewModel(),
+    viewModel: DashboardViewModel = koinViewModel(),
 
     ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -106,8 +104,8 @@ fun TransactionsScreen(
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(10) {
-                            TransactionItem()
+                        items(state.transactions) { transactionUi ->
+                            TransactionItem(transactionUi = transactionUi)
                         }
                     }
                 }
