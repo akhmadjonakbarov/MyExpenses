@@ -18,4 +18,9 @@ sealed interface DashboardAction {
     data object OnShowExportBottomSheet : DashboardAction
     data object Initialization : DashboardAction
     data class OnDeleteTransaction(val transactionUi: TransactionUi) : DashboardAction
+    data object OnExportToExcel : DashboardAction
+
+    data class OnManageDeleteConfirmTransaction(val value: Boolean) : DashboardAction
+
+
 }

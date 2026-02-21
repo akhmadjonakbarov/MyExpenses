@@ -24,7 +24,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
@@ -73,7 +72,10 @@ fun TransactionsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             IconButton(
-                                onClick = {}) {
+                                onClick = {
+                                    onAction(DashboardAction.OnExportToExcel)
+                                },
+                            ) {
                                 Icon(
                                     imageVector = ImageVector.vectorResource(
                                         R.drawable.download_icon

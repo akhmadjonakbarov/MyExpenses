@@ -19,5 +19,7 @@ data class DashboardState(
     val balance: Double = 0.0,
     val selectedCurrencyUi: CurrencyUi = CurrencyUi.UZS,
     val largestTransactionUi: TransactionUi? = null,
-    val totalPreviewWeekTransaction: Double = 0.0
+    val totalPreviewWeekTransaction: Double = 0.0,
+    val showConfirmDeleteTransaction: Boolean = false,
+    val deleteTransactionUi: TransactionUi? = null,
 )

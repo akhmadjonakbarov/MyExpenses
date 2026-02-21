@@ -13,13 +13,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.core.design_system.common_components.IconLabelBox
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
@@ -41,27 +49,55 @@ fun DeletableTransactionItem(
     currencyUi: CurrencyUi,
     onDelete: () -> Unit
 ) {
-    // 1. Create the state that tracks the swipe
+    var showDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-                true
+                showDialog = true
+                false
             } else {
                 false
             }
         }
     )
 
-    // 2. The Swipe Box
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                scope.launch { dismissState.reset() }
+            },
+            title = { Text("Delete Transaction") },
+            text = { Text("Are you sure you want to delete this transaction for ${transactionUi.receiver}?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete()
+                    showDialog = false
+                }) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    scope.launch { dismissState.reset() }
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     SwipeToDismissBox(
         state = dismissState,
-        enableDismissFromStartToEnd = false, // We only want to swipe left to delete
+        enableDismissFromStartToEnd = false,
         backgroundContent = {
-            val color = when (dismissState.dismissDirection) {
-                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                else -> Color.Transparent
-            }
+            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                MaterialTheme.colorScheme.errorContainer
+            } else Color.Transparent
 
             Box(
                 modifier = Modifier
@@ -70,15 +106,10 @@ fun DeletableTransactionItem(
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error
-                )
+                Icon(Icons.Default.Delete, "Delete", tint = MaterialTheme.colorScheme.error)
             }
         }
     ) {
-        // 3. Your original TransactionItem is the "Foreground"
         TransactionItem(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
             transactionUi = transactionUi,
@@ -86,6 +117,7 @@ fun DeletableTransactionItem(
         )
     }
 }
+
 
 @Composable
 fun TransactionItem(

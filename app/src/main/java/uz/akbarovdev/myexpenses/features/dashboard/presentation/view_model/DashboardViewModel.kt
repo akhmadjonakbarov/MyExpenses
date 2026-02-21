@@ -3,9 +3,11 @@ package uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,12 +21,16 @@ import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.BalanceRepository
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.TransactionRepository
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
+import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceEvents
 
 class DashboardViewModel(
     val transactionRepository: TransactionRepository,
     val balanceRepository: BalanceRepository,
     val applicationContext: Context
 ) : ViewModel() {
+
+    val eventChannel = Channel<DashboardEvents>()
+    val events = eventChannel.receiveAsFlow()
 
     private var hasLoadedInitialData = false
 
@@ -85,8 +91,21 @@ class DashboardViewModel(
             }
 
             is DashboardAction.OnDeleteTransaction -> deleteTransaction(action.transactionUi)
+            is DashboardAction.OnExportToExcel -> exportToExcel()
+            is DashboardAction.OnManageDeleteConfirmTransaction -> {
+                viewModelScope.launch {
+                    _state.update { it.copy(showConfirmDeleteTransaction = action.value) }
+                }
+            }
 
             DashboardAction.Initialization -> initialization()
+        }
+    }
+
+    private fun exportToExcel() {
+        viewModelScope.launch {
+            val transactions = transactionRepository.getTransactions()
+            eventChannel.send(DashboardEvents.OnExportTransactionsDone)
         }
     }
 
