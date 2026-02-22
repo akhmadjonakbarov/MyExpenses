@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
+import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AccountBalance
 import uz.akbarovdev.myexpenses.core.design_system.common_components.CreatingTransactionBottomSheetWrapper
@@ -146,7 +148,8 @@ fun DashboardScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Latest Transaction", style = MaterialTheme.typography.titleLarge
+                            stringResource(R.string.latest_transactions),
+                            style = MaterialTheme.typography.titleLarge
                         )
                         // TODO: if transactions don't exist, hide the button
                         TextButton(
@@ -155,7 +158,7 @@ fun DashboardScreen(
                             },
                         ) {
                             Text(
-                                "Show all",
+                                stringResource(R.string.show_all),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -172,7 +175,7 @@ fun DashboardScreen(
 
                         else -> {
                             Text(
-                                "Today",
+                                stringResource(R.string.today),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                             Spacer(

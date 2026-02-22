@@ -72,39 +72,7 @@ fun AmountInputTextField(
             cursorColor = MaterialTheme.colorScheme.primary
         )
     )
-//    Row(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .height(80.dp), // Adjust height as needed
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.Center
-//    ) {
-//
-//
-//        Box(
-//            modifier = Modifier
-//                .fillMaxHeight(),
-//
-//            contentAlignment = Alignment.Center
-//        ) {
-////            if (state.amountText.isEmpty()) {
-////                Row {
-////                    Text(
-////                        text = "00.00",
-////                        style = MaterialTheme.typography.displaySmall,
-////                        color = Color.Gray
-////                    )
-////                    Text(
-////                        state.selectedCurrencyUi.code, style = MaterialTheme.typography.labelLarge,
-////                    )
-////                }
-////            }
-//
-//
-//        }
-//
-//
-//    }
+
 }
 
 @Preview(showBackground = true)

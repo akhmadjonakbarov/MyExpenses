@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 
 @Composable
@@ -32,7 +33,8 @@ fun AccountBalance(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                "$balance", style = MaterialTheme.typography.displayMedium,
+                CurrencyFormatter.format(balance),
+                style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
 
                 )

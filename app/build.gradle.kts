@@ -17,12 +17,21 @@ android {
         applicationId = "uz.akbarovdev.myexpenses"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(project.findProperty("MYAPP_UPLOAD_STORE_FILE") as String)
+            storePassword = project.findProperty("MYAPP_UPLOAD_STORE_PASSWORD") as String
+            keyAlias = project.findProperty("MYAPP_UPLOAD_KEY_ALIAS") as String
+            keyPassword = project.findProperty("MYAPP_UPLOAD_KEY_PASSWORD") as String
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -31,7 +40,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

@@ -7,6 +7,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import uz.akbarovdev.myexpenses.R
 
 @Composable
 fun NoTransaction(modifier: Modifier = Modifier) {
@@ -14,7 +16,8 @@ fun NoTransaction(modifier: Modifier = Modifier) {
         modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         Text(
-            "Transactions don't exist", style = MaterialTheme.typography.titleLarge
+            stringResource(R.string.transactions_do_not_exist),
+            style = MaterialTheme.typography.titleLarge
         )
     }
 }

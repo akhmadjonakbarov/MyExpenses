@@ -33,19 +33,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.common_components.IconLabelBox
+import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 import uz.akbarovdev.myexpenses.ui.theme.Success
-import java.text.NumberFormat
-import java.util.Locale
+
 
 @Composable
 fun DeletableTransactionItem(
@@ -85,7 +87,7 @@ fun DeletableTransactionItem(
             },
             title = {
                 Text(
-                    text = "Delete Transaction?",
+                    text = stringResource(R.string.delete_transaction),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -95,7 +97,7 @@ fun DeletableTransactionItem(
             },
             text = {
                 Text(
-                    text = "Are you sure you want to remove this record? This will affect your total balance.",
+                    text = stringResource(R.string.confirm_delete),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant, // Your #44474B
                     textAlign = TextAlign.Center,
@@ -116,7 +118,7 @@ fun DeletableTransactionItem(
                     shape = RoundedCornerShape(16.dp),
 
                     ) {
-                    Text("Delete", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.delete), fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
@@ -133,7 +135,7 @@ fun DeletableTransactionItem(
                     shape = RoundedCornerShape(16.dp),
 
                     ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
             // Modern M3 Styling
@@ -221,15 +223,7 @@ fun TransactionItem(
 
 @Composable
 fun Amount(type: String, amount: Double, currencyUi: CurrencyUi) {
-    // 1. Get a Number instance instead of a Currency instance
-    val formatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
-        minimumFractionDigits = 2
-        maximumFractionDigits = 2
-    }
-
-    val formattedNumber = formatter.format(amount)
-
-    // 2. Add your custom prefix
+    val formattedNumber = CurrencyFormatter.format(amount)
     val displayValue = if (type == "expense") "-$formattedNumber" else "+$formattedNumber"
 
     Text(

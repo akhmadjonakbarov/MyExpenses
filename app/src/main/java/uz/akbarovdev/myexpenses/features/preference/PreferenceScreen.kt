@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,9 +25,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
+import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.BackButton
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
 import uz.akbarovdev.myexpenses.features.preference.presentation.components.CurrencyDropDownMenu
+import uz.akbarovdev.myexpenses.features.preference.presentation.components.LanguageDropDownMenu
 import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceAction
 import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceEvents
 import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceState
@@ -113,11 +116,23 @@ fun PreferenceScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Text("Currency")
+            Text(stringResource(R.string.currency))
             CurrencyDropDownMenu(
                 { currencyUi ->
                     onAction(PreferenceAction.OnSelectCurrency(currencyUi))
-                }
+                },
+                hintText = stringResource(R.string.select_currency),
+            )
+            Spacer(
+                Modifier.height(16.dp)
+            )
+            Text(stringResource(R.string.lang))
+            LanguageDropDownMenu(
+                { currencyUi ->
+//                    onAction()
+                },
+
+                hintText = stringResource(R.string.select_language),
             )
 
         }

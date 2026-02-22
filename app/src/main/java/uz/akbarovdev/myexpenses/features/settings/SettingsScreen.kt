@@ -21,21 +21,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
+import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
 import uz.akbarovdev.myexpenses.features.settings.components.MenuItem
@@ -82,7 +81,7 @@ fun SettingsScreen(
                 },
                 title = {
                     Title(
-                        title = "Settings",
+                        title = stringResource(R.string.settings),
                     )
                 }
             )
@@ -107,7 +106,7 @@ fun SettingsScreen(
                     MenuItem(
                         icon = Icons.Outlined.Settings,
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                        text = "Preference",
+                        text = stringResource(R.string.preference),
                         onClick = { navController.navigate(NavigationRoutes.Preference) }
                     )
 
@@ -119,7 +118,7 @@ fun SettingsScreen(
                     MenuItem(
                         icon = Icons.Default.Lock,
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                        text = "Security",
+                        text = stringResource(R.string.security),
                         onClick = { navController.navigate(NavigationRoutes.Preference) }
                     )
                 }
@@ -141,7 +140,7 @@ fun SettingsScreen(
             ) {
                 MenuItem(
                     icon = Icons.Default.ExitToApp,
-                    text = "Log out",
+                    text = stringResource(R.string.logout),
                     containerColor = MaterialTheme.colorScheme.error.copy(0.08f),
                     textColor = MaterialTheme.colorScheme.error,
                     onClick = { navController.navigate(NavigationRoutes.Preference) }

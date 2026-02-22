@@ -1,6 +1,7 @@
 package uz.akbarovdev.myexpenses.features.dashboard.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import uz.akbarovdev.myexpenses.R
+import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
@@ -33,7 +37,7 @@ fun TransactionInfo(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp),
+            .height(90.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -52,35 +56,39 @@ fun TransactionInfo(
             Column(
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        state.largestTransactionUi?.receiver ?: "",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (state.largestTransactionUi != null)
-                            Text(
-                                "${state.largestTransactionUi?.amount}",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                        else
-                            Text(
-                                "${0.0}",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                        Text(
-                            "${state.selectedCurrencyUi.code}",
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                    }
-                }
+                Text(
+                    state.largestTransactionUi?.receiver ?: "",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
 
+                        .basicMarquee(
+                            iterations = Int.MAX_VALUE, // Loop forever
+
+                            initialDelayMillis = 1000, // Wait 1 second on first render
+                            velocity = 30.dp
+                        ),           // Scroll speed),
+                    maxLines = 1
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (state.largestTransactionUi != null)
+                        Text(
+                            CurrencyFormatter.format(state.largestTransactionUi.amount),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    else
+                        Text(
+                            "${0.0}",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    Text(
+                        state.selectedCurrencyUi.code,
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -130,13 +138,13 @@ fun TransactionInfo(
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        "${state.selectedCurrencyUi.code}",
+                        state.selectedCurrencyUi.code,
                         style = MaterialTheme.typography.titleSmall,
                     )
                 }
 
                 Text(
-                    "Previous week",
+                    stringResource(R.string.previous_week),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -150,10 +158,10 @@ private fun TransactionInfoPreview() {
     TransactionInfo(
         state = DashboardState(
             largestTransactionUi = TransactionUi(
-                amount = 2500000.0,
+                amount = 25500.0,
                 icon = CategoryUi.ENTERTAINMENT,
                 note = "for debt",
-                receiver = "Akmal",
+                receiver = "Adneralin & Milk",
                 id = 1,
 
                 )

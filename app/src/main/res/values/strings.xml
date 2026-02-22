@@ -1,3 +1,34 @@
 <resources>
-    <string name="app_name">MyExpenses</string>
+    <string name="app_name">Xarajatlar</string>
+    <string name="save">Saqlash</string>
+    <string name="lang">Til</string>
+    <string name="currency">Valyuta</string>
+    <string name="cancel">Bekor qilish</string>
+    <string name="delete">O\'chirish</string>
+    <string name="delete_transaction">Hisobotni o\'chirish</string>
+    <string name="latest_transactions">Oxirgi hisobotlar</string>
+    <string name="today">Bugun</string>
+    <string name="show_all">Hammasi</string>
+    <string name="all_transactions">Barcha hisobotlar</string>
+    <string name="previous_week">Haftalik hisbot</string>
+    <string name="note">Eslatma</string>
+    <string name="add_note">Eslatma qo\'shish</string>
+    <string name="education">Talim</string>
+    <string name="food">Oziq-ovqat</string>
+    <string name="drinks">Ichimliklar</string>
+    <string name="health">Sog\'lik</string>
+    <string name="clothes">Kiyimlar</string>
+    <string name="confirm_delete">Siz bu hisobotni o\'chirishni istaysizmi?</string>
+    <string name="logout">Chiqish</string>
+    <string name="security">Xavfsizlik</string>
+    <string name="settings">Sozlamalar</string>
+    <string name="categories">Bo\'limlar</string>
+    <string name="expense">Chiqim</string>
+    <string name="income">Kirim</string>
+    <string name="transactions_do_not_exist">Hisobotlar mavjud emas!</string>
+    <string name="preference">Afzalliklar</string>
+    <string name="select_currency">Valyutani tanlash</string>
+    <string name="select_language">Tilni tanlash</string>
+
+
 </resources>
