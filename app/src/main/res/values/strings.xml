@@ -29,6 +29,10 @@
     <string name="preference">Afzalliklar</string>
     <string name="select_currency">Valyutani tanlash</string>
     <string name="select_language">Tilni tanlash</string>
+    <string name="add_new_transaction">Yangi hisobot qo\'shish</string>
+    <string name="to">Qayerga</string>
+    <string name="from">Qayerdan</string>
+    <string name="entertainment">Ko\'ngilxushlik</string>
 
 
 </resources>

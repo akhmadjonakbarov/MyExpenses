@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -86,7 +87,8 @@ fun CreatingTransactionBottomSheet(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Latest Transaction", style = MaterialTheme.typography.titleLarge
+                stringResource(R.string.add_new_transaction),
+                style = MaterialTheme.typography.titleLarge
             )
             IconButton(
                 onClick = onDismiss,
@@ -120,8 +122,9 @@ fun CreatingTransactionBottomSheet(
                         )
                     )
                 },
-                text = "Expense",
-                isSelected = state.transactionType == TransactionType.Expense
+                text = stringResource(R.string.expense),
+                isSelected = state.transactionType == TransactionType.Expense,
+                transactionType = TransactionType.Expense
             )
             Spacer(Modifier.width(5.dp))
             TabButton(
@@ -133,8 +136,9 @@ fun CreatingTransactionBottomSheet(
                         )
                     )
                 },
-                text = "Income",
-                isSelected = state.transactionType == TransactionType.Income
+                text = stringResource(R.string.income),
+                isSelected = state.transactionType == TransactionType.Income,
+                transactionType = TransactionType.Income
             )
         }
         Spacer(
@@ -155,7 +159,9 @@ fun CreatingTransactionBottomSheet(
                         )
                     )
                 },
-                hintText = "Receiver"
+                hintText = if (state.transactionType == TransactionType.Expense) stringResource(R.string.to) else stringResource(
+                    R.string.from
+                )
             )
 
             AmountInputTextField(
@@ -166,7 +172,7 @@ fun CreatingTransactionBottomSheet(
             )
 
             TransparentBasicTextField(
-                hintText = "+ Add Note",
+                hintText = stringResource(R.string.add_note),
                 text = state.noteText,
                 onValueChange = {
                     onAction(
@@ -199,7 +205,7 @@ fun CreatingTransactionBottomSheet(
                 )
             }
         ) {
-            Text("Create", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.save), style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -210,7 +216,8 @@ fun TabButton(
     modifier: Modifier = Modifier,
     isSelected: Boolean,
     onClick: () -> Unit,
-    text: String
+    text: String,
+    transactionType: TransactionType,
 ) {
     Button(
         modifier = modifier,
@@ -231,7 +238,7 @@ fun TabButton(
                 color = if (isSelected) MaterialTheme.colorScheme.primary else OnPrimaryFixed
             )
             Icon(
-                imageVector = if (text.lowercase().contains("expense")) ImageVector.vectorResource(
+                imageVector = if (transactionType == TransactionType.Expense) ImageVector.vectorResource(
                     R.drawable.expenses
                 ) else ImageVector.vectorResource(
                     R.drawable.income

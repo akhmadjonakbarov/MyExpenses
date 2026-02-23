@@ -4,7 +4,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import uz.akbarovdev.myexpenses.core.design_system.common_components.DropDownMenu
-import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -14,8 +13,7 @@ fun <T> GenericDropDownMenu(
     onSelectValue: (T) -> Unit,
     modifier: Modifier = Modifier,
     selectedValue: T? = null,
-    hintText: String = "Select Option",
-    // This function tells the UI how to display the object
+    hintText: String,
     labelMapper: (T) -> String = { it.toString() }
 ) {
     DropDownMenu(
