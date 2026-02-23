@@ -8,9 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Delete
@@ -18,11 +22,15 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,33 +43,163 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.common_components.IconLabelBox
 import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 import uz.akbarovdev.myexpenses.ui.theme.Success
 
+
+//@Composable
+//fun DeletableTransactionItem(
+//    transactionUi: TransactionUi,
+//    currencyUi: CurrencyUi,
+//    onDelete: () -> Unit
+//) {
+//    var showDialog by remember { mutableStateOf(false) }
+//    val scope = rememberCoroutineScope()
+//
+//    val dismissState = rememberSwipeToDismissBoxState(
+//        confirmValueChange = { value ->
+//            if (value == SwipeToDismissBoxValue.EndToStart) {
+//                showDialog = true
+//                false
+//            } else {
+//                false
+//            }
+//        }
+//    )
+//
+//
+//    if (showDialog) {
+//        AlertDialog(
+//            onDismissRequest = {
+//                showDialog = false
+//                scope.launch { dismissState.reset() }
+//            },
+//            icon = {
+//
+//                Icon(
+//                    imageVector = Icons.Rounded.Delete,
+//                    contentDescription = null,
+//                    tint = MaterialTheme.colorScheme.primary,
+//                    modifier = Modifier.size(32.dp)
+//                )
+//            },
+//            title = {
+//                Text(
+//                    text = stringResource(R.string.delete_transaction),
+//                    style = MaterialTheme.typography.headlineSmall,
+//                    fontWeight = FontWeight.Bold,
+//                    color = MaterialTheme.colorScheme.onSurface,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//            },
+//            text = {
+//                Text(
+//                    text = stringResource(R.string.confirm_delete),
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Your #44474B
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//            },
+//            confirmButton = {
+//
+//                Button(
+//                    onClick = {
+//                        onDelete()
+//                        showDialog = false
+//                    },
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = MaterialTheme.colorScheme.primary,
+//                        contentColor = MaterialTheme.colorScheme.onPrimary
+//                    ),
+//                    shape = RoundedCornerShape(16.dp),
+//
+//                    ) {
+//                    Text(stringResource(R.string.delete), fontWeight = FontWeight.SemiBold)
+//                }
+//            },
+//            dismissButton = {
+//                // Using your SurfaceContainerLow for a subtle "Cancel" button
+//                FilledTonalButton(
+//                    onClick = {
+//                        showDialog = false
+//                        scope.launch { dismissState.reset() }
+//                    },
+//                    colors = ButtonDefaults.filledTonalButtonColors(
+//                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+//                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                    ),
+//                    shape = RoundedCornerShape(16.dp),
+//
+//                    ) {
+//                    Text(stringResource(R.string.cancel))
+//                }
+//            },
+//            // Modern M3 Styling
+//            shape = RoundedCornerShape(28.dp),
+//            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest, // Pure White #FFFFFF
+//            tonalElevation = 0.dp // We use your explicit surface colors instead of elevation tints
+//        )
+//    }
+//
+//    SwipeToDismissBox(
+//        state = dismissState,
+//        enableDismissFromStartToEnd = false,
+//        backgroundContent = {
+//            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+//                MaterialTheme.colorScheme.errorContainer
+//            } else Color.Transparent
+//
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(color, shape = RoundedCornerShape(12.dp))
+//                    .padding(horizontal = 20.dp),
+//                contentAlignment = Alignment.CenterEnd
+//            ) {
+//                Icon(Icons.Default.Delete, "Delete", tint = MaterialTheme.colorScheme.error)
+//            }
+//        }
+//    ) {
+//        TransactionItem(
+//            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+//            transactionUi = transactionUi,
+//            currencyUi = currencyUi
+//        )
+//    }
+//}
 
 @Composable
 fun DeletableTransactionItem(
     transactionUi: TransactionUi,
     currencyUi: CurrencyUi,
+    state: DashboardState,
+    onAction: (DashboardAction) -> Unit,
     onDelete: () -> Unit
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
-                showDialog = true
+                showDeleteDialog = true
                 false
             } else {
                 false
@@ -69,15 +207,14 @@ fun DeletableTransactionItem(
         }
     )
 
-
-    if (showDialog) {
+    // --- DELETE CONFIRMATION DIALOG ---
+    if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = {
-                showDialog = false
+                showDeleteDialog = false
                 scope.launch { dismissState.reset() }
             },
             icon = {
-
                 Icon(
                     imageVector = Icons.Rounded.Delete,
                     contentDescription = null,
@@ -99,79 +236,153 @@ fun DeletableTransactionItem(
                 Text(
                     text = stringResource(R.string.confirm_delete),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Your #44474B
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {
-
                 Button(
                     onClick = {
                         onDelete()
-                        showDialog = false
+                        showDeleteDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-
-                    ) {
-                    Text(stringResource(R.string.delete), fontWeight = FontWeight.SemiBold)
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(stringResource(R.string.delete), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
-                // Using your SurfaceContainerLow for a subtle "Cancel" button
-                FilledTonalButton(
+                TextButton(
                     onClick = {
-                        showDialog = false
+                        showDeleteDialog = false
                         scope.launch { dismissState.reset() }
                     },
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-
-                    ) {
-                    Text(stringResource(R.string.cancel))
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.outline)
                 }
             },
-            // Modern M3 Styling
             shape = RoundedCornerShape(28.dp),
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest, // Pure White #FFFFFF
-            tonalElevation = 0.dp // We use your explicit surface colors instead of elevation tints
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
         )
     }
 
+    // --- EDIT TRANSACTION DIALOG ---
+    if (showEditDialog) {
+        AlertDialog(
+            onDismissRequest = { showEditDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+            modifier = Modifier.fillMaxWidth(0.92f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            shape = RoundedCornerShape(28.dp),
+            title = {
+                Text(
+                    "Edit Transaction",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    OutlinedTextField(
+                        value = state.amountText,
+                        onValueChange = { onAction(DashboardAction.OnAmountInputChange(it)) },
+                        label = { Text("Amount") },
+                        prefix = { Text("${currencyUi.code} ") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                    )
+
+                    OutlinedTextField(
+                        value = state.receiverText,
+                        onValueChange = { onAction(DashboardAction.OnReceiverInputChange(it)) },
+                        label = { Text("Receiver") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "Category",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            items(CategoryUi.entries) { category ->
+                                val isSelected = state.selectedCategoryUi == category
+                                FilterChip(
+                                    selected = isSelected,
+                                    onClick = { onAction(DashboardAction.OnSelectCategory(category)) },
+                                    label = { Text(category.label) },
+                                    leadingIcon = { Text(category.emoji) },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        selectedLabelColor = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onAction(DashboardAction.OnCreateTransaction)
+                        showEditDialog = false
+                    },
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text("Save Changes", fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    }
+
+    // --- SWIPE BACKGROUND ---
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
-            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                MaterialTheme.colorScheme.errorContainer
-            } else Color.Transparent
+            val isDismissing = dismissState.targetValue == SwipeToDismissBoxValue.EndToStart
+            val backgroundColor = if (isDismissing) MaterialTheme.colorScheme.errorContainer else Color.Transparent
+            val iconColor = if (isDismissing) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 20.dp),
+                    .padding(vertical = 4.dp) // Aligns with item padding
+                    .background(backgroundColor, shape = RoundedCornerShape(16.dp))
+                    .padding(horizontal = 24.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Icon(Icons.Default.Delete, "Delete", tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    imageVector = Icons.Rounded.Delete,
+                    contentDescription = "Delete",
+                    tint = iconColor,
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     ) {
         TransactionItem(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
             transactionUi = transactionUi,
-            currencyUi = currencyUi
+            currencyUi = currencyUi,
+            onEditClick = {
+                onAction(DashboardAction.OnSelectEditTransaction(transactionUi))
+                showEditDialog = true
+            }
         )
     }
 }
-
 
 @Composable
 fun TransactionItem(

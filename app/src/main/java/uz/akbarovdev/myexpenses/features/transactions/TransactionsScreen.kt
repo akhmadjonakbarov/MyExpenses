@@ -32,6 +32,7 @@ import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.BackButton
 import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DeletableTransactionItem
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionItem
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
@@ -108,7 +109,19 @@ fun TransactionsScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         items(state.transactions) { transactionUi ->
-                            TransactionItem(transactionUi = transactionUi)
+                            DeletableTransactionItem(
+                                transactionUi = transactionUi,
+                                currencyUi = state.selectedCurrencyUi,
+                                state = state,
+                                onAction = onAction,
+                                onDelete = {
+                                    onAction(
+                                        DashboardAction.OnDeleteTransaction(
+                                            transactionUi
+                                        )
+                                    )
+                                }
+                            )
                         }
                     }
                 }

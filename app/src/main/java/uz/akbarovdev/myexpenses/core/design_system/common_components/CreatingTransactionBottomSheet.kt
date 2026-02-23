@@ -10,16 +10,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -29,12 +34,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryButton
 import uz.akbarovdev.myexpenses.core.design_system.text_fields.TransparentBasicTextField
 import uz.akbarovdev.myexpenses.core.enums.TransactionType
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AmountInputTextField
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.CategoryDropdown
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
@@ -185,15 +192,15 @@ fun CreatingTransactionBottomSheet(
         }
 
         Spacer(Modifier.height(15.dp))
-
-        CategoryDropdown(
-            selectedCategory = state.selectedCategoryUi,
-            onCategorySelected = {
-                onAction(
-                    DashboardAction.OnSelectCategory(it),
-                )
-            }
-        )
+        if (state.transactionType == TransactionType.Expense)
+            CategoryDropdown(
+                selectedCategory = state.selectedCategoryUi,
+                onCategorySelected = {
+                    onAction(
+                        DashboardAction.OnSelectCategory(it),
+                    )
+                }
+            )
         Spacer(Modifier.height(10.dp))
         PrimaryButton(
             modifier = Modifier

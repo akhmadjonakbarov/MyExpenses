@@ -12,7 +12,7 @@ data class DashboardState(
     val receiverText: String = "",
     val noteText: String = "",
     val amountText: String = "",
-    val selectedCategoryUi: CategoryUi = CategoryUi.ENTERTAINMENT,
+    val selectedCategoryUi: CategoryUi? = CategoryUi.ENTERTAINMENT,
     val selectedRepetition: Repetition = Repetition.Daily,
     val transactions: List<TransactionUi> = emptyList(),
     val exportBottomSheet: Boolean = false,
@@ -22,4 +22,5 @@ data class DashboardState(
     val totalPreviewWeekTransaction: Double = 0.0,
     val showConfirmDeleteTransaction: Boolean = false,
     val deleteTransactionUi: TransactionUi? = null,
+    val editingTransaction: TransactionUi? = null
 )

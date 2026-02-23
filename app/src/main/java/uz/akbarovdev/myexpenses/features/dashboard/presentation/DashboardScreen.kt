@@ -189,6 +189,8 @@ fun DashboardScreen(
                                     DeletableTransactionItem(
                                         transactionUi = transactionUi,
                                         currencyUi = state.selectedCurrencyUi,
+                                        state = state,
+                                        onAction = onAction,
                                         onDelete = {
                                             onAction(
                                                 DashboardAction.OnDeleteTransaction(

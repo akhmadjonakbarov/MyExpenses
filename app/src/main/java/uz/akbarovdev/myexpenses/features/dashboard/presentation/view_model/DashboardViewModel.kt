@@ -99,6 +99,18 @@ class DashboardViewModel(
             }
 
             DashboardAction.Initialization -> initialization()
+            is DashboardAction.OnSelectEditTransaction -> {
+                _state.update {
+                    it.copy(
+                        editingTransaction = action.transactionUi,
+                        amountText = action.transactionUi.amount.toString(),
+                        noteText = action.transactionUi.note,
+                        receiverText = action.transactionUi.receiver,
+                        selectedCategoryUi = action.transactionUi.icon,
+                        transactionType = if (action.transactionUi.type == "income") TransactionType.Income else TransactionType.Expense
+                    )
+                }
+            }
         }
     }
 
@@ -146,7 +158,7 @@ class DashboardViewModel(
             val note = currentState.noteText
             val receiver = currentState.receiverText
             val transactionType = currentState.transactionType
-            val selectedCategory = currentState.selectedCategoryUi.name
+            val selectedCategory = currentState.selectedCategoryUi?.name
             if (transactionType == TransactionType.Income) {
                 val balances = balanceRepository.getAllBalances()
                 if (balances.isNotEmpty()) {
