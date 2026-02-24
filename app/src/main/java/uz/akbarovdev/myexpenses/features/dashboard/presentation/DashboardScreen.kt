@@ -47,6 +47,7 @@ import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.Delet
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.FloatButton
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionInfo
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionItem
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionList
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardViewModel
@@ -181,26 +182,7 @@ fun DashboardScreen(
                             Spacer(
                                 Modifier.height(10.dp)
                             )
-                            LazyColumn(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(state.transactions) { transactionUi ->
-                                    DeletableTransactionItem(
-                                        transactionUi = transactionUi,
-                                        currencyUi = state.selectedCurrencyUi,
-                                        state = state,
-                                        onAction = onAction,
-                                        onDelete = {
-                                            onAction(
-                                                DashboardAction.OnDeleteTransaction(
-                                                    transactionUi
-                                                )
-                                            )
-                                        }
-                                    )
-                                }
-                            }
+                            TransactionList(state, onAction)
                         }
                     }
                 }
