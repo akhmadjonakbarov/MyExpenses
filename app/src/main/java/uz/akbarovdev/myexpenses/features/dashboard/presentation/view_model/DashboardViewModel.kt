@@ -218,9 +218,7 @@ class DashboardViewModel(
             )
 
             transactionRepository.createTransaction(updatedTransaction)
-            // Note: Ensure your Room DAO uses OnConflictStrategy.REPLACE
 
-            // 4. Reset State
             _state.update {
                 it.copy(
                     amountText = "",
