@@ -100,15 +100,28 @@ class DashboardViewModel(
 
             DashboardAction.Initialization -> initialization()
             is DashboardAction.OnSelectEditTransaction -> {
-                _state.update {
-                    it.copy(
-                        editingTransaction = action.transactionUi,
-                        amountText = action.transactionUi.amount.toString(),
-                        noteText = action.transactionUi.note,
-                        receiverText = action.transactionUi.receiver,
-                        selectedCategoryUi = action.transactionUi.icon,
-                        transactionType = if (action.transactionUi.type == "income") TransactionType.Income else TransactionType.Expense
-                    )
+                if (action.transactionUi != null) {
+                    _state.update {
+                        it.copy(
+                            editingTransaction = action.transactionUi,
+                            amountText = action.transactionUi.amount.toString(),
+                            noteText = action.transactionUi.note,
+                            receiverText = action.transactionUi.receiver,
+                            selectedCategoryUi = action.transactionUi.icon,
+                            transactionType = if (action.transactionUi.type == "income") TransactionType.Income else TransactionType.Expense
+                        )
+                    }
+                } else {
+                    _state.update {
+                        it.copy(
+                            amountText = "",
+                            noteText = "",
+                            receiverText = "",
+                            selectedCategoryUi = null,
+                            transactionType = TransactionType.Expense,
+                            editingTransaction = null
+                        )
+                    }
                 }
             }
         }
