@@ -22,6 +22,7 @@ sealed interface DashboardAction {
     data class OnSelectEditTransaction(val transactionUi: TransactionUi?) : DashboardAction
 
     data class OnManageDeleteConfirmTransaction(val value: Boolean) : DashboardAction
+    data object OnEditTransaction : DashboardAction
 
 
 }

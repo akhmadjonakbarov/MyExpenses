@@ -25,4 +25,5 @@ data class DashboardState(
     val editingTransaction: TransactionUi? = null,
     val dailyTransactions: List<TransactionUi> = emptyList(),
 
+
 )

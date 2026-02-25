@@ -54,6 +54,7 @@ import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.common_components.IconLabelBox
+import uz.akbarovdev.myexpenses.core.enums.TransactionType
 import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
@@ -354,7 +355,7 @@ fun DeletableTransactionItem(
             confirmButton = {
                 Button(
                     onClick = {
-                        onAction(DashboardAction.OnCreateTransaction)
+                        onAction(DashboardAction.OnEditTransaction)
                         showEditDialog = false
                     },
                     modifier = Modifier
@@ -464,14 +465,15 @@ fun TransactionItem(
 }
 
 @Composable
-fun Amount(type: String, amount: Double, currencyUi: CurrencyUi) {
+fun Amount(type: TransactionType, amount: Double, currencyUi: CurrencyUi) {
     val formattedNumber = CurrencyFormatter.format(amount)
-    val displayValue = if (type == "expense") "-$formattedNumber" else "+$formattedNumber"
+    val displayValue =
+        if (type == TransactionType.Expense) "-$formattedNumber" else "+$formattedNumber"
 
     Text(
         text = "$displayValue ${currencyUi.code}",
         style = MaterialTheme.typography.titleMedium,
-        color = if (type == "expense") MaterialTheme.colorScheme.error else Success,
+        color = if (type == TransactionType.Expense) MaterialTheme.colorScheme.error else Success,
         fontWeight = FontWeight.W600
     )
 }
@@ -490,7 +492,7 @@ private fun TransactionPreview() {
             amount = 25.25,
             icon = CategoryUi.ENTERTAINMENT,
             note = "for debt",
-            type = "income",
+            type = TransactionType.Income,
             receiver = "amazon",
             id = 1
         )

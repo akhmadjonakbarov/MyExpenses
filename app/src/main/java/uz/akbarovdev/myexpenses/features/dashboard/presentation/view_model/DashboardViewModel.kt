@@ -2,6 +2,7 @@ package uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model
 
 import android.content.Context
 import android.text.format.DateUtils
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -18,12 +19,10 @@ import uz.akbarovdev.myexpenses.core.extension.sharedPreferences
 import uz.akbarovdev.myexpenses.features.dashboard.daos.balance.BalanceEntity
 import uz.akbarovdev.myexpenses.features.dashboard.daos.transaction.TransactionEntity
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
-import uz.akbarovdev.myexpenses.features.dashboard.domain.models.Transaction
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.BalanceRepository
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.TransactionRepository
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
-import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceEvents
 
 class DashboardViewModel(
     val transactionRepository: TransactionRepository,
@@ -108,7 +107,7 @@ class DashboardViewModel(
                             noteText = action.transactionUi.note,
                             receiverText = action.transactionUi.receiver,
                             selectedCategoryUi = action.transactionUi.icon,
-                            transactionType = if (action.transactionUi.type == "income") TransactionType.Income else TransactionType.Expense
+                            transactionType = if (action.transactionUi.type == TransactionType.Income) TransactionType.Income else TransactionType.Expense
                         )
                     }
                 } else {
@@ -124,6 +123,8 @@ class DashboardViewModel(
                     }
                 }
             }
+
+            DashboardAction.OnEditTransaction -> editTransaction()
         }
     }
 
@@ -140,7 +141,7 @@ class DashboardViewModel(
             getBalances()
             getTransactions()
             _state.update {
-                it.copy(selectedCurrencyUi = CurrencyUi.entries.find { it.code == symbolOfCurrency }
+                it.copy(selectedCurrencyUi = CurrencyUi.entries.find { currency -> currency.code == symbolOfCurrency }
                     ?: CurrencyUi.UZS)
             }
             findLargestTransaction()
@@ -170,7 +171,7 @@ class DashboardViewModel(
             TransactionUi(
                 id = transaction.id,
                 amount = transaction.amount,
-                type = transaction.type.lowercase(),
+                type = identifyType(transaction.type),
                 note = transaction.note ?: "",
                 receiver = transaction.receiver ?: "",
                 icon = CategoryUi.entries.find { it.name == transaction.category }
@@ -179,18 +180,58 @@ class DashboardViewModel(
         _state.update { it.copy(dailyTransactions = dailyTransactions) }
     }
 
-    private fun editTransaction(transaction: Transaction) {
+    private fun identifyType(value: String): TransactionType {
+        val transactionType = if (value.equals(
+                TransactionType.Income.name, ignoreCase = true
+            )
+        ) TransactionType.Income else TransactionType.Expense
+        return transactionType
+    }
+
+    private fun editTransaction() {
         viewModelScope.launch {
             val currentState = state.value
-            val amount = currentState.amountText.toDoubleOrNull() ?: 0.0
-            val note = currentState.noteText
-            val receiver = currentState.receiverText
-            val transactionType = currentState.transactionType
-            val selectedCategory = currentState.selectedCategoryUi?.name
-            if (currentState.editingTransaction != null) {
-                deleteTransaction(currentState.editingTransaction)
+            val editingTransaction = currentState.editingTransaction ?: return@launch
+
+            val newAmount = currentState.amountText.toDoubleOrNull() ?: 0.0
+            val oldAmount = editingTransaction.amount
+
+            val balance = getLastBalance()
+
+            val balanceDifference = if (editingTransaction.type == TransactionType.Income) {
+                newAmount - oldAmount
+            } else {
+                oldAmount - newAmount
             }
 
+            balanceRepository.instertBalance(
+                balance.copy(amount = balance.amount + balanceDifference)
+            )
+
+            val updatedTransaction = TransactionEntity(
+                id = editingTransaction.id,
+                amount = newAmount,
+                note = currentState.noteText,
+                receiver = currentState.receiverText,
+                type = currentState.transactionType.name,
+                category = currentState.selectedCategoryUi?.name
+            )
+
+            transactionRepository.createTransaction(updatedTransaction)
+            // Note: Ensure your Room DAO uses OnConflictStrategy.REPLACE
+
+            // 4. Reset State
+            _state.update {
+                it.copy(
+                    amountText = "",
+                    noteText = "",
+                    receiverText = "",
+                    selectedCategoryUi = null,
+                    editingTransaction = null,
+
+                    )
+            }
+            initialization()
         }
     }
 
@@ -259,7 +300,7 @@ class DashboardViewModel(
             val transactionUi = TransactionUi(
                 id = transaction.id,
                 amount = transaction.amount,
-                type = transaction.type.lowercase(),
+                type = identifyType(transaction.type),
                 note = transaction.note ?: "",
                 receiver = transaction.receiver ?: "",
                 icon = CategoryUi.entries.find { it.name == transaction.category }
@@ -289,12 +330,12 @@ class DashboardViewModel(
             val transactionEntity = TransactionEntity(
                 id = transactionUi.id,
                 amount = transactionUi.amount,
-                type = transactionUi.type,
+                type = transactionUi.type.name,
                 note = transactionUi.note,
-                receiver = transactionUi.receiver ?: "",
+                receiver = transactionUi.receiver,
                 category = transactionUi.icon.name
             )
-            if (transactionUi.type == "income") {
+            if (transactionUi.type == TransactionType.Income) {
                 balanceRepository.instertBalance(
                     balance.copy(
                         amount = balance.amount - transactionUi.amount
@@ -329,7 +370,7 @@ class DashboardViewModel(
             val transactionUi = TransactionUi(
                 id = largestTransaction.id,
                 amount = largestTransaction.amount,
-                type = largestTransaction.type.lowercase(),
+                type = identifyType(largestTransaction.type),
                 note = largestTransaction.note ?: "",
                 receiver = largestTransaction.receiver ?: "",
                 icon = CategoryUi.entries.find { it.name == largestTransaction.category }
@@ -351,6 +392,10 @@ class DashboardViewModel(
                 .sumOf { it.amount }
 
         _state.update { it.copy(totalPreviewWeekTransaction = totalWeeklyTransaction) }
+    }
+
+    companion object {
+        val TAG = "DashboardViewModel"
     }
 
 }

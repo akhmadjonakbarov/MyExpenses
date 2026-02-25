@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uz.akbarovdev.myexpenses.R
+import uz.akbarovdev.myexpenses.core.enums.TransactionType
 import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
@@ -163,8 +164,8 @@ private fun TransactionInfoPreview() {
                 note = "for debt",
                 receiver = "Adneralin & Milk",
                 id = 1,
-
-                )
+                type = TransactionType.Income
+            )
         )
     )
 }
