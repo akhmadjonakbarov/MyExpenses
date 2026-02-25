@@ -2,6 +2,7 @@ package uz.akbarovdev.myexpenses.features.dashboard.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -23,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SwipeToDismissBox
@@ -39,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -268,27 +272,46 @@ fun DeletableTransactionItem(
         )
     }
 
-    // --- EDIT TRANSACTION DIALOG ---
+
     if (showEditDialog) {
         AlertDialog(
-            onDismissRequest = { showEditDialog = false },
+            onDismissRequest = {
+                showEditDialog = false
+                onAction(
+                    DashboardAction.OnSelectEditTransaction(null)
+                )
+            },
             properties = DialogProperties(usePlatformDefaultWidth = false),
             modifier = Modifier.fillMaxWidth(0.92f),
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
             shape = RoundedCornerShape(28.dp),
             title = {
-                Text(
-                    "Edit Transaction",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        stringResource(R.string.edit_transaction),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = {
+                            onAction(DashboardAction.OnSelectEditTransaction(null))
+                            showEditDialog = false
+                        },
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Close Icon")
+                    }
+                }
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     OutlinedTextField(
                         value = state.amountText,
                         onValueChange = { onAction(DashboardAction.OnAmountInputChange(it)) },
-                        label = { Text("Amount") },
+                        label = { Text("") },
                         prefix = { Text("${currencyUi.code} ") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
@@ -298,14 +321,14 @@ fun DeletableTransactionItem(
                     OutlinedTextField(
                         value = state.receiverText,
                         onValueChange = { onAction(DashboardAction.OnReceiverInputChange(it)) },
-                        label = { Text("Receiver") },
+                        label = { Text(stringResource(R.string.from)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp)
                     )
 
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            "Category",
+                            stringResource(R.string.categories),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -315,7 +338,7 @@ fun DeletableTransactionItem(
                                 FilterChip(
                                     selected = isSelected,
                                     onClick = { onAction(DashboardAction.OnSelectCategory(category)) },
-                                    label = { Text(category.label) },
+                                    label = { Text(stringResource(category.code)) },
                                     leadingIcon = { Text(category.emoji) },
                                     shape = RoundedCornerShape(12.dp),
                                     colors = FilterChipDefaults.filterChipColors(
@@ -334,11 +357,13 @@ fun DeletableTransactionItem(
                         onAction(DashboardAction.OnCreateTransaction)
                         showEditDialog = false
                     },
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Save Changes", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
                 }
             }
         )
@@ -350,8 +375,10 @@ fun DeletableTransactionItem(
         enableDismissFromStartToEnd = false,
         backgroundContent = {
             val isDismissing = dismissState.targetValue == SwipeToDismissBoxValue.EndToStart
-            val backgroundColor = if (isDismissing) MaterialTheme.colorScheme.errorContainer else Color.Transparent
-            val iconColor = if (isDismissing) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
+            val backgroundColor =
+                if (isDismissing) MaterialTheme.colorScheme.errorContainer else Color.Transparent
+            val iconColor =
+                if (isDismissing) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
 
             Box(
                 modifier = Modifier
@@ -387,13 +414,19 @@ fun TransactionItem(
     modifier: Modifier = Modifier,
     transactionUi: TransactionUi,
     currencyUi: CurrencyUi = CurrencyUi.UZS,
-    onDeleteClick: () -> Unit = {},
+
     onEditClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onEditClick() } // Clicking the row triggers edit
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { _ ->
+                        onEditClick()
+                    }
+                )
+            }
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -424,7 +457,7 @@ fun TransactionItem(
             }
         }
 
-        // Right Side: Amount and Delete Button
+
         Amount(transactionUi.type, transactionUi.amount, currencyUi)
 
     }
@@ -452,7 +485,7 @@ private fun TransactionPreview() {
     TransactionItem(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp), onDeleteClick = {},
+            .padding(5.dp),
         transactionUi = TransactionUi(
             amount = 25.25,
             icon = CategoryUi.ENTERTAINMENT,
