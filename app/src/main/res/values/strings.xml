@@ -33,6 +33,7 @@
     <string name="to">Qayerga</string>
     <string name="from">Qayerdan</string>
     <string name="entertainment">Ko\'ngilxushlik</string>
+    <string name="edit_transaction">Hisobotni yangilash</string>
     
 
 </resources>
