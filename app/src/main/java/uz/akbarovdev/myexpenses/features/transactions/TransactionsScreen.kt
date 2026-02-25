@@ -106,7 +106,7 @@ fun TransactionsScreen(
                 }
 
                 else -> {
-                    TransactionList(state, onAction)
+                    TransactionList(state.transactions, state, onAction)
                 }
             }
         }

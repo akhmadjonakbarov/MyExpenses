@@ -22,5 +22,7 @@ data class DashboardState(
     val totalPreviewWeekTransaction: Double = 0.0,
     val showConfirmDeleteTransaction: Boolean = false,
     val deleteTransactionUi: TransactionUi? = null,
-    val editingTransaction: TransactionUi? = null
+    val editingTransaction: TransactionUi? = null,
+    val dailyTransactions: List<TransactionUi> = emptyList(),
+
 )

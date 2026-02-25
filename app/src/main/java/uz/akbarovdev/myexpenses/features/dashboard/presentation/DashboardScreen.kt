@@ -166,7 +166,7 @@ fun DashboardScreen(
                         }
                     }
                     when {
-                        state.transactions.isEmpty() -> {
+                        state.dailyTransactions.isEmpty() -> {
                             Box(
                                 Modifier.fillMaxSize()
                             ) {
@@ -182,7 +182,7 @@ fun DashboardScreen(
                             Spacer(
                                 Modifier.height(10.dp)
                             )
-                            TransactionList(state, onAction)
+                            TransactionList(state.dailyTransactions, state, onAction)
                         }
                     }
                 }

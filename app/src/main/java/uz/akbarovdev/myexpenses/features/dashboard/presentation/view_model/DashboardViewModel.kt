@@ -1,6 +1,7 @@
 package uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model
 
 import android.content.Context
+import android.text.format.DateUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -17,6 +18,7 @@ import uz.akbarovdev.myexpenses.core.extension.sharedPreferences
 import uz.akbarovdev.myexpenses.features.dashboard.daos.balance.BalanceEntity
 import uz.akbarovdev.myexpenses.features.dashboard.daos.transaction.TransactionEntity
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.Transaction
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.BalanceRepository
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.TransactionRepository
@@ -35,18 +37,16 @@ class DashboardViewModel(
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(DashboardState())
-    val state = _state
-        .onStart {
-            if (!hasLoadedInitialData) {
-                onAction(DashboardAction.Initialization)
-                hasLoadedInitialData = true
-            }
+    val state = _state.onStart {
+        if (!hasLoadedInitialData) {
+            onAction(DashboardAction.Initialization)
+            hasLoadedInitialData = true
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = DashboardState()
-        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = DashboardState()
+    )
 
     fun onAction(action: DashboardAction) {
         when (action) {
@@ -140,13 +140,12 @@ class DashboardViewModel(
             getBalances()
             getTransactions()
             _state.update {
-                it.copy(
-                    selectedCurrencyUi = CurrencyUi.entries.find { it.code == symbolOfCurrency }
-                        ?: CurrencyUi.UZS
-                )
+                it.copy(selectedCurrencyUi = CurrencyUi.entries.find { it.code == symbolOfCurrency }
+                    ?: CurrencyUi.UZS)
             }
             findLargestTransaction()
             calculateWeeklyTransaction()
+            getDailyTransactions()
         }
     }
 
@@ -163,8 +162,41 @@ class DashboardViewModel(
         }
     }
 
+    private suspend fun getDailyTransactions() {
+        val transactions = transactionRepository.getTransactions()
+        val dailyTransactions = transactions.filter {
+            DateUtils.isToday(it.createdAt)
+        }.sortedByDescending { it.createdAt }.map { transaction ->
+            TransactionUi(
+                id = transaction.id,
+                amount = transaction.amount,
+                type = transaction.type.lowercase(),
+                note = transaction.note ?: "",
+                receiver = transaction.receiver ?: "",
+                icon = CategoryUi.entries.find { it.name == transaction.category }
+                    ?: CategoryUi.ENTERTAINMENT)
+        }
+        _state.update { it.copy(dailyTransactions = dailyTransactions) }
+    }
+
+    private fun editTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            val currentState = state.value
+            val amount = currentState.amountText.toDoubleOrNull() ?: 0.0
+            val note = currentState.noteText
+            val receiver = currentState.receiverText
+            val transactionType = currentState.transactionType
+            val selectedCategory = currentState.selectedCategoryUi?.name
+            if (currentState.editingTransaction != null) {
+                deleteTransaction(currentState.editingTransaction)
+            }
+
+        }
+    }
+
 
     private fun createTransaction() {
+
         viewModelScope.launch {
             val currentState = state.value
             val amount = currentState.amountText.toDoubleOrNull() ?: 0.0
@@ -175,7 +207,7 @@ class DashboardViewModel(
             if (transactionType == TransactionType.Income) {
                 val balances = balanceRepository.getAllBalances()
                 if (balances.isNotEmpty()) {
-                    val lastBalance = balances.last()
+                    val lastBalance = getLastBalance()
                     val updatedBalance = lastBalance.copy(
                         amount = lastBalance.amount + amount
                     )
@@ -189,7 +221,7 @@ class DashboardViewModel(
             } else {
                 val balances = balanceRepository.getAllBalances()
                 if (balances.isNotEmpty()) {
-                    val lastBalance = balances.last()
+                    val lastBalance = getLastBalance()
                     val updatedBalance = lastBalance.copy(
                         amount = lastBalance.amount - amount
                     )
@@ -198,6 +230,7 @@ class DashboardViewModel(
             }
 
             val transaction = TransactionEntity(
+                id = currentState.editingTransaction?.id ?: 0,
                 amount = amount,
                 note = note,
                 receiver = receiver,
@@ -222,7 +255,7 @@ class DashboardViewModel(
     private suspend fun getTransactions() {
         val transactions = transactionRepository.getTransactions()
         val modifiedTransaction = mutableListOf<TransactionUi>()
-        transactions.forEach { transaction ->
+        transactions.sortedByDescending { it.createdAt }.forEach { transaction ->
             val transactionUi = TransactionUi(
                 id = transaction.id,
                 amount = transaction.amount,
@@ -230,8 +263,7 @@ class DashboardViewModel(
                 note = transaction.note ?: "",
                 receiver = transaction.receiver ?: "",
                 icon = CategoryUi.entries.find { it.name == transaction.category }
-                    ?: CategoryUi.ENTERTAINMENT
-            )
+                    ?: CategoryUi.ENTERTAINMENT)
             modifiedTransaction.add(transactionUi)
         }
         _state.update {
@@ -252,7 +284,7 @@ class DashboardViewModel(
 
     private fun deleteTransaction(transactionUi: TransactionUi) {
         viewModelScope.launch {
-            val balance = getBalance()
+            val balance = getLastBalance()
 
             val transactionEntity = TransactionEntity(
                 id = transactionUi.id,
@@ -283,7 +315,8 @@ class DashboardViewModel(
         }
     }
 
-    private suspend fun getBalance(): BalanceEntity {
+
+    private suspend fun getLastBalance(): BalanceEntity {
         val balances = balanceRepository.getAllBalances()
         return balances.last()
     }
@@ -300,8 +333,7 @@ class DashboardViewModel(
                 note = largestTransaction.note ?: "",
                 receiver = largestTransaction.receiver ?: "",
                 icon = CategoryUi.entries.find { it.name == largestTransaction.category }
-                    ?: CategoryUi.ENTERTAINMENT
-            )
+                    ?: CategoryUi.ENTERTAINMENT)
             _state.update { it.copy(largestTransactionUi = transactionUi) }
         }
     }
@@ -314,9 +346,9 @@ class DashboardViewModel(
         val transactions = transactionRepository.getTransactions()
 
 
-        val totalWeeklyTransaction = transactions
-            .filter { it.type == TransactionType.Expense.name && it.createdAt >= cutoffTime }
-            .sumOf { it.amount }
+        val totalWeeklyTransaction =
+            transactions.filter { it.type == TransactionType.Expense.name && it.createdAt >= cutoffTime }
+                .sumOf { it.amount }
 
         _state.update { it.copy(totalPreviewWeekTransaction = totalWeeklyTransaction) }
     }
