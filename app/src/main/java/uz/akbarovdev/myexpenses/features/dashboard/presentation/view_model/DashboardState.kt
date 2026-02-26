@@ -3,6 +3,7 @@ package uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model
 import uz.akbarovdev.myexpenses.core.enums.TransactionType
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.Repetition
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionGroup
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 
@@ -15,7 +16,9 @@ data class DashboardState(
     val selectedCategoryUi: CategoryUi? = CategoryUi.ENTERTAINMENT,
     val selectedRepetition: Repetition = Repetition.Daily,
     val transactions: List<TransactionUi> = emptyList(),
+    val transactionGroups: List<TransactionGroup> = emptyList(),
     val exportBottomSheet: Boolean = false,
+
     val balance: Double = 0.0,
     val selectedCurrencyUi: CurrencyUi = CurrencyUi.UZS,
     val largestTransactionUi: TransactionUi? = null,
@@ -24,6 +27,6 @@ data class DashboardState(
     val deleteTransactionUi: TransactionUi? = null,
     val editingTransaction: TransactionUi? = null,
     val dailyTransactions: List<TransactionUi> = emptyList(),
-
+    val dailyTotal: Double = 0.0
 
 )

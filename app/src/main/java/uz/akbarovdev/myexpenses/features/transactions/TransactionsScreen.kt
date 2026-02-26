@@ -5,6 +5,7 @@ package uz.akbarovdev.myexpenses.features.transactions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +34,10 @@ import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.BackButton
 import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
+import uz.akbarovdev.myexpenses.core.enums.TransactionType
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionGroup
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DeletableTransactionItem
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionItem
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionList
@@ -101,12 +107,40 @@ fun TransactionsScreen(
                 .padding(10.dp)
         ) {
             when {
-                state.transactions.isEmpty() -> {
+                state.transactionGroups.isEmpty() -> {
                     NoTransaction()
                 }
 
                 else -> {
-                    TransactionList(state.transactions, state, onAction)
+                    LazyColumn {
+                        state.transactionGroups.forEach { group ->
+                            // Sticky headers are a great UX addition for dates
+                            stickyHeader(key = group.date) {
+                                Row {
+                                    Text(
+                                        text = group.date,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            }
+
+                            items(
+                                items = group.transactions,
+                                key = { it.id } // Always use keys for better animations/stability
+                            ) { transaction ->
+                                DeletableTransactionItem(
+                                    transactionUi = transaction,
+                                    currencyUi = state.selectedCurrencyUi,
+                                    state = state,
+                                    onAction = onAction,
+                                    onDelete = {
+                                        onAction(DashboardAction.OnDeleteTransaction(transaction))
+                                    }
+                                )
+                            }
+                        }
+                    }
+//                    TransactionList(state.transactions, state, onAction)
                 }
             }
         }
@@ -116,9 +150,24 @@ fun TransactionsScreen(
 @Preview
 @Composable
 private fun Preview() {
+
     MyExpensesTheme {
         TransactionsScreen(
-            state = DashboardState(), onAction = {}, navController = rememberNavController()
+            state = DashboardState(
+                transactionGroups = mutableListOf(
+                    TransactionGroup(
+                        date = "Today",
+                        transactions = mutableListOf(
+                            TransactionUi(
+                                0,
+                                CategoryUi.ENTERTAINMENT,
+                                100.0,
+                                TransactionType.Income
+                            )
+                        )
+                    )
+                )
+            ), onAction = {}, navController = rememberNavController()
         )
     }
 }

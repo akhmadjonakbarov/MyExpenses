@@ -3,10 +3,10 @@ package uz.akbarovdev.myexpenses.features.dashboard.domain.models
 import uz.akbarovdev.myexpenses.core.enums.TransactionType
 import java.util.Date
 
-//data class TransactionGroup(
-//    val date: Date,
-//    val transactions: List<Transaction> = emptyList()
-//)
+data class TransactionGroup(
+    val date: String,
+    val transactions: List<TransactionUi> = emptyList()
+)
 
 data class TransactionUi(
     val id: Int,

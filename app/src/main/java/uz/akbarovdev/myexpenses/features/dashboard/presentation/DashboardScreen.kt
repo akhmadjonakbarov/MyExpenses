@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -39,14 +37,13 @@ import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
-import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AccountBalance
 import uz.akbarovdev.myexpenses.core.design_system.common_components.CreatingTransactionBottomSheetWrapper
 import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
+import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
+import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AccountBalance
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DashboardHeader
-import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DeletableTransactionItem
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.FloatButton
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionInfo
-import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionItem
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.TransactionList
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardAction
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
@@ -152,7 +149,7 @@ fun DashboardScreen(
                             stringResource(R.string.latest_transactions),
                             style = MaterialTheme.typography.titleLarge
                         )
-                        // TODO: if transactions don't exist, hide the button
+
                         TextButton(
                             onClick = {
                                 navController.navigate(NavigationRoutes.Transactions)
@@ -175,10 +172,22 @@ fun DashboardScreen(
                         }
 
                         else -> {
-                            Text(
-                                stringResource(R.string.today),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    stringResource(R.string.today),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                                Text(
+                                    "-${CurrencyFormatter.format(state.dailyTotal)} ${state.selectedCurrencyUi.code}",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontWeight = FontWeight.W700
+                                )
+                            }
                             Spacer(
                                 Modifier.height(10.dp)
                             )

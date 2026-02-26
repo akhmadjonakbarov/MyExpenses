@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -399,7 +400,10 @@ fun DeletableTransactionItem(
         }
     ) {
         TransactionItem(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+            modifier = Modifier.background(
+                MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(16.dp)
+            ),
             transactionUi = transactionUi,
             currencyUi = currencyUi,
             onEditClick = {

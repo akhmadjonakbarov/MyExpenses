@@ -16,9 +16,11 @@ import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.core.constants.PrefKeys
 import uz.akbarovdev.myexpenses.core.enums.TransactionType
 import uz.akbarovdev.myexpenses.core.extension.sharedPreferences
+import uz.akbarovdev.myexpenses.core.formatters.DateFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.daos.balance.BalanceEntity
 import uz.akbarovdev.myexpenses.features.dashboard.daos.transaction.TransactionEntity
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionGroup
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.BalanceRepository
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.TransactionRepository
@@ -147,6 +149,7 @@ class DashboardViewModel(
             findLargestTransaction()
             calculateWeeklyTransaction()
             getDailyTransactions()
+            getTransactionsGroup()
         }
     }
 
@@ -163,6 +166,32 @@ class DashboardViewModel(
         }
     }
 
+    private suspend fun getTransactionsGroup() {
+        val transactions = transactionRepository.getTransactions()
+
+        val groupedByDate = transactions.groupBy { DateFormatter.format(it.createdAt) }
+
+        val modifiedTransactionGroups = groupedByDate.map { (dateString, transactionList) ->
+            TransactionGroup(
+                date = dateString,
+                transactions = transactionList.sortedByDescending { it.createdAt }
+                    .map { transaction ->
+                        TransactionUi(
+                            id = transaction.id,
+                            amount = transaction.amount,
+                            type = identifyType(transaction.type),
+                            note = transaction.note ?: "",
+                            receiver = transaction.receiver ?: "",
+                            icon = CategoryUi.entries.find { it.name == transaction.category }
+                                ?: CategoryUi.ENTERTAINMENT
+                        )
+                    }
+            )
+        }
+
+        _state.update { it.copy(transactionGroups = modifiedTransactionGroups) }
+    }
+
     private suspend fun getDailyTransactions() {
         val transactions = transactionRepository.getTransactions()
         val dailyTransactions = transactions.filter {
@@ -177,7 +206,9 @@ class DashboardViewModel(
                 icon = CategoryUi.entries.find { it.name == transaction.category }
                     ?: CategoryUi.ENTERTAINMENT)
         }
-        _state.update { it.copy(dailyTransactions = dailyTransactions) }
+        val total =
+            dailyTransactions.filter { it.type == TransactionType.Expense }.sumOf { it.amount }
+        _state.update { it.copy(dailyTransactions = dailyTransactions, dailyTotal = total) }
     }
 
     private fun identifyType(value: String): TransactionType {
