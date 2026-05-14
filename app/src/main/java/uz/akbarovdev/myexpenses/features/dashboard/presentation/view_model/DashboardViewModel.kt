@@ -2,7 +2,6 @@ package uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model
 
 import android.content.Context
 import android.text.format.DateUtils
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -171,7 +170,7 @@ class DashboardViewModel(
 
         val groupedByDate = transactions.groupBy { DateFormatter.format(it.createdAt) }
 
-        val modifiedTransactionGroups = groupedByDate.map { (dateString, transactionList) ->
+        var modifiedTransactionGroups = groupedByDate.map { (dateString, transactionList) ->
             TransactionGroup(
                 date = dateString,
                 transactions = transactionList.sortedByDescending { it.createdAt }
@@ -188,6 +187,7 @@ class DashboardViewModel(
                     }
             )
         }
+        modifiedTransactionGroups = modifiedTransactionGroups.sortedByDescending { it.date }
 
         _state.update { it.copy(transactionGroups = modifiedTransactionGroups) }
     }
@@ -235,7 +235,7 @@ class DashboardViewModel(
                 oldAmount - newAmount
             }
 
-            balanceRepository.instertBalance(
+            balanceRepository.insertBalance(
                 balance.copy(amount = balance.amount + balanceDifference)
             )
 
@@ -281,12 +281,12 @@ class DashboardViewModel(
                     val updatedBalance = lastBalance.copy(
                         amount = lastBalance.amount + amount
                     )
-                    balanceRepository.instertBalance(updatedBalance)
+                    balanceRepository.insertBalance(updatedBalance)
                 } else {
                     val balance = BalanceEntity(
                         amount = amount
                     )
-                    balanceRepository.instertBalance(balance)
+                    balanceRepository.insertBalance(balance)
                 }
             } else {
                 val balances = balanceRepository.getAllBalances()
@@ -295,7 +295,7 @@ class DashboardViewModel(
                     val updatedBalance = lastBalance.copy(
                         amount = lastBalance.amount - amount
                     )
-                    balanceRepository.instertBalance(updatedBalance)
+                    balanceRepository.insertBalance(updatedBalance)
                 }
             }
 
@@ -365,13 +365,13 @@ class DashboardViewModel(
                 category = transactionUi.icon.name
             )
             if (transactionUi.type == TransactionType.Income) {
-                balanceRepository.instertBalance(
+                balanceRepository.insertBalance(
                     balance.copy(
                         amount = balance.amount - transactionUi.amount
                     )
                 )
             } else {
-                balanceRepository.instertBalance(
+                balanceRepository.insertBalance(
                     balance.copy(
                         amount = balance.amount + transactionUi.amount
                     )
