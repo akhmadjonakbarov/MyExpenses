@@ -15,5 +15,6 @@ data class TransactionUi(
     val type: TransactionType,
     val note: String = "",
     val receiver: String = "",
+    val createdAt: String = ""
 )
 

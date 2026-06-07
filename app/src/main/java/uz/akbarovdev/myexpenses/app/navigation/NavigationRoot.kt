@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.DashboardRoot
-import uz.akbarovdev.myexpenses.features.preference.PreferenceRoot
+import uz.akbarovdev.myexpenses.features.preference.presentation.PreferenceRoot
 import uz.akbarovdev.myexpenses.features.settings.SettingsRoot
 import uz.akbarovdev.myexpenses.features.transactions.TransactionsRoot
 

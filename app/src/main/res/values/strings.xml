@@ -34,6 +34,14 @@
     <string name="from">Qayerdan</string>
     <string name="entertainment">Ko\'ngilxushlik</string>
     <string name="edit_transaction">Hisobotni yangilash</string>
-    
+    <string name="largest_transaction">Yirik hisobot</string>
 
+    <string name="transport">Transport va Yoqilg\'i</string>
+    <string name="housing">Ijara va Uy-joy</string>
+    <string name="utilities">Kommunal to\'lovlar</string>
+    <string name="shopping">Xaridlar</string>
+    <string name="travel">Sayohatlar</string>
+    <string name="investment">Investitsiyalar va Jamg\'arma</string>
+    <string name="gifts">Sovg\'alar va Ehsonlar</string>
+    <string name="others">Boshqalar</string>
 </resources>
