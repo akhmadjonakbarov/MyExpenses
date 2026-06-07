@@ -44,4 +44,8 @@
     <string name="investment">Investitsiyalar va Jamg\'arma</string>
     <string name="gifts">Sovg\'alar va Ehsonlar</string>
     <string name="others">Boshqalar</string>
+    <string name="debt_notebook">Qarz daftar</string>
+    <string name="debts_list">Qarzlar ro\'yhati</string>
+    <string name="all">Barchasi</string>
+
 </resources>

@@ -14,4 +14,10 @@ sealed interface NavigationRoutes {
 
     @Serializable
     data object Preference : NavigationRoutes
+
+    @Serializable
+    data object DebtList : NavigationRoutes
+
+    @Serializable
+    data class DebtDetail(val userId: Int) : NavigationRoutes
 }

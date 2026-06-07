@@ -9,6 +9,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import uz.akbarovdev.myexpenses.app.di.appModule
 import uz.akbarovdev.myexpenses.features.dashboard.dashboardModule
+import uz.akbarovdev.myexpenses.features.debt.debtModule
 import uz.akbarovdev.myexpenses.features.preference.preferenceModule
 import uz.akbarovdev.myexpenses.features.settings.settingsModule
 import uz.akbarovdev.myexpenses.core.databases.databaseModule
@@ -22,7 +23,7 @@ class MyExpensesApp : Application() {
         startKoin {
             androidContext(this@MyExpensesApp)
             modules(
-                appModule, databaseModule, dashboardModule, settingsModule, preferenceModule,
+                appModule, databaseModule, dashboardModule, settingsModule, preferenceModule, debtModule,
             )
         }
 

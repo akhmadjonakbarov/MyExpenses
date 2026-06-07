@@ -9,6 +9,12 @@ enum class CategoryUi(
     val color: Color,
     val code: Int
 ) {
+    ALL(
+        emoji = "📊",
+        label = "All Categories",
+        code = R.string.all, // Ensure you have R.string.all defined in your strings.xml
+        color = Color(0xFF9E9E9E) // Neutral Grey
+    ),
     ENTERTAINMENT(
         emoji = "💻",
         label = "Entertainment",

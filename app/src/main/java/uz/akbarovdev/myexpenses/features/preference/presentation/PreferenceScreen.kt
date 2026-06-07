@@ -68,7 +68,6 @@ fun PreferenceRoot(
 @Composable
 fun PreferenceScreen(
     snackBarHostState: SnackbarHostState,
-
     navController: NavController,
     state: PreferenceState, onAction: (PreferenceAction) -> Unit, isInitial: Boolean = false,
 ) {
@@ -82,7 +81,7 @@ fun PreferenceScreen(
                 title = {
                     if (!isInitial) {
                         Title(
-                            title = "Preference",
+                            title = stringResource(R.string.preference),
                         )
                     }
                 },

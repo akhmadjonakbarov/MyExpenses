@@ -40,6 +40,7 @@ import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.core.design_system.common_components.CreatingTransactionBottomSheetWrapper
 import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
 import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
+import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.AccountBalance
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.DashboardHeader
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.components.FloatButton
@@ -152,6 +153,7 @@ fun DashboardScreen(
 
                         TextButton(
                             onClick = {
+                                onAction(DashboardAction.OnFilterTransaction(CategoryUi.ALL))
                                 navController.navigate(NavigationRoutes.Transactions)
                             },
                         ) {

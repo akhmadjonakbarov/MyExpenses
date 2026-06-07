@@ -5,7 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.DashboardRoot
+import uz.akbarovdev.myexpenses.features.debt.presentation.DebtDetailRoot
+import uz.akbarovdev.myexpenses.features.debt.presentation.DebtListRoot
 import uz.akbarovdev.myexpenses.features.preference.presentation.PreferenceRoot
 import uz.akbarovdev.myexpenses.features.settings.SettingsRoot
 import uz.akbarovdev.myexpenses.features.transactions.TransactionsRoot
@@ -29,6 +32,13 @@ fun NavigationRoot(
         }
         composable<NavigationRoutes.Preference> {
             PreferenceRoot(navController)
+        }
+        composable<NavigationRoutes.DebtList> {
+            DebtListRoot(navController)
+        }
+        composable<NavigationRoutes.DebtDetail> { backStackEntry ->
+            val route = backStackEntry.toRoute<NavigationRoutes.DebtDetail>()
+            DebtDetailRoot(navController, route.userId)
         }
     }
 

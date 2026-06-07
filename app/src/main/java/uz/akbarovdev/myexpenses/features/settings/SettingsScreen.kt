@@ -121,6 +121,7 @@ fun SettingsScreen(
                         text = stringResource(R.string.security),
                         onClick = { navController.navigate(NavigationRoutes.Preference) }
                     )
+
                 }
             }
 

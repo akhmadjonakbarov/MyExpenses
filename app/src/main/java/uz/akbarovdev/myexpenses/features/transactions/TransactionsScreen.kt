@@ -2,6 +2,8 @@
 
 package uz.akbarovdev.myexpenses.features.transactions
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,10 +11,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -20,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -106,6 +114,40 @@ fun TransactionsScreen(
                 )
                 .padding(10.dp)
         ) {
+            LazyRow(
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(CategoryUi.entries) { categoryUi ->
+                    val isSelected = state.selectedFilteredCategoryUi == categoryUi
+                    val animatedScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.08f else 1f,
+                        animationSpec = spring(dampingRatio = 0.5f, stiffness = 300f),
+                        label = "chipScale",
+                    )
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onAction(DashboardAction.OnFilterTransaction(categoryUi)) },
+                        modifier = Modifier.scale(animatedScale),
+                        label = { Text(stringResource(categoryUi.code)) },
+                        leadingIcon = { Text(categoryUi.emoji) },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = isSelected,
+                            borderColor = Color.Transparent,
+                            selectedBorderColor = Color.Transparent,
+                        ),
+                    )
+                }
+            }
+
             when {
                 state.transactionGroups.isEmpty() -> {
                     NoTransaction()
@@ -114,7 +156,6 @@ fun TransactionsScreen(
                 else -> {
                     LazyColumn {
                         state.transactionGroups.forEach { group ->
-                            // Sticky headers are a great UX addition for dates
                             stickyHeader(key = group.date) {
                                 Row {
                                     Text(
@@ -126,7 +167,7 @@ fun TransactionsScreen(
 
                             items(
                                 items = group.transactions,
-                                key = { it.id } // Always use keys for better animations/stability
+                                key = { it.id }
                             ) { transaction ->
                                 DeletableTransactionItem(
                                     transactionUi = transaction,
@@ -140,7 +181,6 @@ fun TransactionsScreen(
                             }
                         }
                     }
-//                    TransactionList(state.transactions, state, onAction)
                 }
             }
         }
@@ -156,7 +196,7 @@ private fun Preview() {
             state = DashboardState(
                 transactionGroups = mutableListOf(
                     TransactionGroup(
-                        date = "Today",
+                        date = stringResource(R.string.today),
                         transactions = mutableListOf(
                             TransactionUi(
                                 0,

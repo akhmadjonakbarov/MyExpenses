@@ -14,11 +14,11 @@ data class DashboardState(
     val noteText: String = "",
     val amountText: String = "",
     val selectedCategoryUi: CategoryUi? = CategoryUi.ENTERTAINMENT,
+    val selectedFilteredCategoryUi: CategoryUi? = CategoryUi.ALL,
     val selectedRepetition: Repetition = Repetition.Daily,
     val transactions: List<TransactionUi> = emptyList(),
     val transactionGroups: List<TransactionGroup> = emptyList(),
     val exportBottomSheet: Boolean = false,
-
     val balance: Double = 0.0,
     val selectedCurrencyUi: CurrencyUi = CurrencyUi.UZS,
     val largestTransactionUi: TransactionUi? = null,

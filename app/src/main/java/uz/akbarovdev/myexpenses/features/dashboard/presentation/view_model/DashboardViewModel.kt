@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -126,8 +127,19 @@ class DashboardViewModel(
             }
 
             DashboardAction.OnEditTransaction -> editTransaction()
+            is DashboardAction.OnFilterTransaction -> viewModelScope.launch {
+                _state.update {
+                    it.copy(
+                        selectedFilteredCategoryUi = action.categoryUi
+                    )
+                }
+                getTransactionsGroup(
+                    action.categoryUi
+                )
+            }
         }
     }
+
 
     private fun exportToExcel() {
         viewModelScope.launch {
@@ -165,10 +177,20 @@ class DashboardViewModel(
         }
     }
 
-    private suspend fun getTransactionsGroup() {
+    private suspend fun getTransactionsGroup(categoryUi: CategoryUi = CategoryUi.ALL) {
         val transactions = transactionRepository.getTransactions()
+        val filteredTransactions = if (categoryUi == CategoryUi.ALL) {
+            transactions
+        } else {
+            transactions.filter {
+                it.category?.contains(
+                    categoryUi.name,
+                    ignoreCase = true
+                ) == true
+            }
+        }
 
-        val groupedByDate = transactions.groupBy { DateFormatter.format(it.createdAt) }
+        val groupedByDate = filteredTransactions.groupBy { DateFormatter.format(it.createdAt) }
 
         var modifiedTransactionGroups = groupedByDate.map { (dateString, transactionList) ->
             TransactionGroup(
@@ -188,6 +210,7 @@ class DashboardViewModel(
             )
         }
         modifiedTransactionGroups = modifiedTransactionGroups.sortedByDescending { it.date }
+
 
         _state.update { it.copy(transactionGroups = modifiedTransactionGroups) }
     }
