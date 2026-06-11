@@ -1,5 +1,6 @@
 package uz.akbarovdev.myexpenses.features.preference.presentation
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,11 +47,30 @@ fun PreferenceRoot(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current.applicationContext
+
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
             when (event) {
-                PreferenceEvents.CurrencySelected -> {
-                    snackBarHostState.showSnackbar("Currency selected")
+                is PreferenceEvents.CurrencySelected -> {
+                    val message = context.getString(R.string.currency_is_selected)
+                    snackBarHostState.showSnackbar(message)
+                }
+
+                is PreferenceEvents.LanguageSelected -> {
+                    val message = context.getString(R.string.language_is_selected)
+                    snackBarHostState.showSnackbar(message)
+                    val packageManager = context.packageManager
+                    val intent = packageManager.getLaunchIntentForPackage(context.packageName)
+
+                    if (intent != null) {
+                        // 2. Clear the entire task stack so the app starts completely fresh
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        context.startActivity(intent)
+
+                        // 3. Optional: Kill the current process to ensure a brutal/clean reset
+                        Runtime.getRuntime().exit(0)
+                    }
                 }
             }
         }
@@ -126,8 +147,8 @@ fun PreferenceScreen(
             )
             Text(stringResource(R.string.lang))
             LanguageDropDownMenu(
-                { currencyUi ->
-//                    onAction()
+                { languageUi ->
+                    onAction(PreferenceAction.OnSelectLanguage(languageUi))
                 },
 
                 hintText = stringResource(R.string.select_language),

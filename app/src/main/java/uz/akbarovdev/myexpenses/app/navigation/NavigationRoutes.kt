@@ -20,4 +20,7 @@ sealed interface NavigationRoutes {
 
     @Serializable
     data class DebtDetail(val userId: Int) : NavigationRoutes
+
+    @Serializable
+    data object Statistics : NavigationRoutes
 }

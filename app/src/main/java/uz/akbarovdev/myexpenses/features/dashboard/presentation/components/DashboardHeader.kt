@@ -23,7 +23,6 @@ import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryIconButton
 
 @Composable
 fun DashboardHeader(
-    goSettingsClick: () -> Unit,
     exportClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,11 +54,7 @@ fun DashboardHeader(
                 contentDescription = "Download",
                 onClick = exportClick,
             )
-            PrimaryIconButton(
-                imageVector = ImageVector.vectorResource(R.drawable.settings),
-                contentDescription = "Settings",
-                onClick = goSettingsClick,
-            )
+
         }
     }
 }

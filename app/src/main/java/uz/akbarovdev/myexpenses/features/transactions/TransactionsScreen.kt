@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
+import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.core.design_system.buttons.BackButton
 import uz.akbarovdev.myexpenses.core.design_system.common_components.NoTransaction
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
@@ -84,7 +87,24 @@ fun TransactionsScreen(
                 )
             }, actions = {
                 when {
-                    state.transactions.isNotEmpty() -> {
+                    state.transactionGroups.isNotEmpty() -> {
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    navController.navigate(NavigationRoutes.Statistics)
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(
+                                        R.drawable.baseline_pie_chart_24
+                                    ),
+                                    tint = Color.Black,
+                                    contentDescription = null,
+                                )
+                            }
+                        }
                         Box(
                             contentAlignment = Alignment.Center
                         ) {
@@ -203,7 +223,13 @@ private fun Preview() {
                                 CategoryUi.ENTERTAINMENT,
                                 100.0,
                                 TransactionType.Income
-                            )
+                            ),
+                                    TransactionUi(
+                                    1,
+                            CategoryUi.DRINKS,
+                            100.0,
+                            TransactionType.Expense
+                        )
                         )
                     )
                 )

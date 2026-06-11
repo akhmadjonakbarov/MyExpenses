@@ -47,5 +47,26 @@
     <string name="debt_notebook">Qarz daftar</string>
     <string name="debts_list">Qarzlar ro\'yhati</string>
     <string name="all">Barchasi</string>
+    <string name="statistics">Statistika</string>
+    <string name="total_income">Umumiy kirim</string>
+    <string name="total_expense">Umumiy chiqim</string>
+    <string name="top_expenses">Eng katta chiqimlar</string>
+    <string name="no_transactions">Hisobotlar mavjud emas</string>
+    <string name="balance">Balans</string>
+    <string name="category_breakdown">Xarajat tahlili</string>
+    <string name="daily_spending">Kunlik chiqimlar</string>
+    <string name="no_debts">Qarzlar mavjud emas</string>
+    <string name="add">Qo\'shish</string>
+    <string name="edit">Tahrirlash</string>
+    <string name="name">Ism</string>
+    <string name="phone_number">Telefon raqam (ixtiyoriy)</string>
+    <string name="i_gave">Men berdim</string>
+    <string name="i_took">Men oldim</string>
+    <string name="you_owe">Sen %1$s dan qarzdorsan</string>
+    <string name="owes_you">%1$s sendan qarzdor</string>
+    <string name="total_balance">Jami hisob</string>
+    <string name="amount">Miqdori</string>
+    <string name="currency_is_selected">Valyuta tanlandi</string>
+    <string name="language_is_selected">Til tanlandi</string>
 
 </resources>

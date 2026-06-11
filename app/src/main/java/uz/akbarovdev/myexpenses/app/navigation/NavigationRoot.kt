@@ -11,6 +11,7 @@ import uz.akbarovdev.myexpenses.features.debt.presentation.DebtDetailRoot
 import uz.akbarovdev.myexpenses.features.debt.presentation.DebtListRoot
 import uz.akbarovdev.myexpenses.features.preference.presentation.PreferenceRoot
 import uz.akbarovdev.myexpenses.features.settings.SettingsRoot
+import uz.akbarovdev.myexpenses.features.transactions.TransactionStatisticsRoot
 import uz.akbarovdev.myexpenses.features.transactions.TransactionsRoot
 
 @Composable
@@ -39,6 +40,9 @@ fun NavigationRoot(
         composable<NavigationRoutes.DebtDetail> { backStackEntry ->
             val route = backStackEntry.toRoute<NavigationRoutes.DebtDetail>()
             DebtDetailRoot(navController, route.userId)
+        }
+        composable<NavigationRoutes.Statistics> {
+            TransactionStatisticsRoot(navController)
         }
     }
 

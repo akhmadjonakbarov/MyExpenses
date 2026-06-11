@@ -106,9 +106,7 @@ fun DashboardScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     DashboardHeader(
-                        goSettingsClick = {
-                            navController.navigate(NavigationRoutes.Settings)
-                        },
+
                         exportClick = {
                             onAction(DashboardAction.OnShowExportBottomSheet)
                         }

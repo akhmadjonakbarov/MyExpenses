@@ -46,6 +46,7 @@ import uz.akbarovdev.myexpenses.features.debt.presentation.DebtDetailRoot
 import uz.akbarovdev.myexpenses.features.debt.presentation.DebtListRoot
 import uz.akbarovdev.myexpenses.features.preference.presentation.PreferenceRoot
 import uz.akbarovdev.myexpenses.features.settings.SettingsRoot
+import uz.akbarovdev.myexpenses.features.transactions.TransactionStatisticsRoot
 import uz.akbarovdev.myexpenses.features.transactions.TransactionsRoot
 
 val LocalDrawerState = staticCompositionLocalOf<DrawerState> {
@@ -100,7 +101,7 @@ fun DrawerNavigationRoot(
                         }
                     )
                     DrawerItem(
-                        label = "Settings",
+                        label = stringResource(R.string.settings),
                         icon = Icons.Default.Settings,
                         isSelected = currentRoute?.contains("Settings") == true,
                         onClick = {
@@ -135,6 +136,9 @@ fun DrawerNavigationRoot(
                 composable<NavigationRoutes.DebtDetail> { backStackEntry ->
                     val route = backStackEntry.toRoute<NavigationRoutes.DebtDetail>()
                     DebtDetailRoot(navController, route.userId)
+                }
+                composable<NavigationRoutes.Statistics> {
+                    TransactionStatisticsRoot(navController)
                 }
             }
         }

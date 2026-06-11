@@ -58,7 +58,9 @@ import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
+import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.debt.domain.models.DebtUserUi
+import uz.akbarovdev.myexpenses.features.debt.presentation.components.DebtUserDialog
 import uz.akbarovdev.myexpenses.features.debt.presentation.view_model.DebtListAction
 import uz.akbarovdev.myexpenses.features.debt.presentation.view_model.DebtListState
 import uz.akbarovdev.myexpenses.features.debt.presentation.view_model.DebtListViewModel
@@ -90,7 +92,7 @@ fun DebtListScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
-                title = { Title(title = "Debt Notebook") }
+                title = { Title(title = stringResource(R.string.debt_notebook)) }
             )
         },
         floatingActionButton = {
@@ -103,11 +105,17 @@ fun DebtListScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(10.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(10.dp)
         ) {
             if (state.users.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No debt records yet", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(R.string.no_debts),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -141,16 +149,43 @@ fun DebtListScreen(
     if (state.userToDelete != null) {
         AlertDialog(
             onDismissRequest = { onAction(DebtListAction.OnDismissDelete) },
-            icon = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp)) },
-            title = { Text("Delete User", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
-            text = { Text("Are you sure you want to delete ${state.userToDelete.name}?", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
+            icon = {
+                Icon(
+                    Icons.Default.Delete,
+                    null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
+                )
+            },
+            title = {
+                Text(
+                    "Delete User",
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Text(
+                    "Are you sure you want to delete ${state.userToDelete.name}?",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
             confirmButton = {
-                Button(onClick = { onAction(DebtListAction.OnConfirmDelete) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+                Button(
+                    onClick = { onAction(DebtListAction.OnConfirmDelete) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
                     Text("Delete", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { onAction(DebtListAction.OnDismissDelete) }, modifier = Modifier.fillMaxWidth()) {
+                TextButton(
+                    onClick = { onAction(DebtListAction.OnDismissDelete) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("Cancel", color = MaterialTheme.colorScheme.outline)
                 }
             },
@@ -178,20 +213,36 @@ fun DebtUserItem(
             Box(
                 modifier = Modifier
                     .size(45.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp)),
+                    .background(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        RoundedCornerShape(12.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(25.dp))
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(25.dp)
+                )
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(user.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.W600)
+                Text(
+                    user.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.W600
+                )
                 if (user.phone.isNotEmpty()) {
-                    Text(user.phone, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        user.phone,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
             Text(
-                text = "${if (user.totalAmount >= 0) "+" else ""}${String.format("%.0f", user.totalAmount)}",
+                text = "${if (user.totalAmount >= 0) "+" else ""}${CurrencyFormatter.format(user.totalAmount)}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (user.totalAmount >= 0) Success else MaterialTheme.colorScheme.error
@@ -200,63 +251,27 @@ fun DebtUserItem(
                 Icon(Icons.Default.Edit, null, modifier = Modifier.size(18.dp))
             }
             IconButton(onClick = onDelete, modifier = Modifier.size(36.dp)) {
-                Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                Icon(
+                    Icons.Default.Delete,
+                    null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(18.dp)
+                )
             }
         }
     }
 }
 
-@Composable
-fun DebtUserDialog(
-    name: String,
-    phone: String,
-    isEditing: Boolean,
-    onNameChange: (String) -> Unit,
-    onPhoneChange: (String) -> Unit,
-    onSave: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-        shape = RoundedCornerShape(28.dp),
-        title = {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(if (isEditing) "Edit User" else "Add User", fontWeight = FontWeight.Bold)
-                IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, null) }
-            }
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = name, onValueChange = onNameChange,
-                    label = { Text("Name") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                OutlinedTextField(
-                    value = phone, onValueChange = onPhoneChange,
-                    label = { Text("Phone (optional)") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = onSave, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(16.dp)) {
-                Text(if (isEditing) "Save" else "Add", fontWeight = FontWeight.Bold)
-            }
-        }
-    )
-}
+
 
 @Preview
 @Composable
 private fun Preview() {
     MyExpensesTheme {
-        DebtListScreen(state = DebtListState(), onAction = {}, navController = rememberNavController())
+        DebtListScreen(
+            state = DebtListState(),
+            onAction = {},
+            navController = rememberNavController()
+        )
     }
 }

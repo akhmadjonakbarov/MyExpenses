@@ -41,6 +41,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
+import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
 import uz.akbarovdev.myexpenses.features.debt.domain.models.DebtTransactionType
 import uz.akbarovdev.myexpenses.features.debt.domain.models.DebtTransactionUi
 import uz.akbarovdev.myexpenses.features.debt.domain.models.DebtUserUi
@@ -76,7 +78,7 @@ fun DebtDetailRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    androidx.compose.runtime.LaunchedEffect(userId) {
+    LaunchedEffect(userId) {
         viewModel.onAction(DebtDetailAction.Initialization(userId))
     }
 
@@ -118,6 +120,12 @@ fun DebtDetailScreen(
                 .padding(10.dp)
         ) {
             state.user?.let { user ->
+                val isOwedToMe = user.totalAmount >= 0
+                val absoluteAmount = kotlin.math.abs(user.totalAmount)
+                val formattedAbsoluteAmount = CurrencyFormatter.format(absoluteAmount)
+
+                val translationResId = if (isOwedToMe) R.string.owes_you else R.string.you_owe
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -132,25 +140,25 @@ fun DebtDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            "Total Balance",
+                            text = stringResource(R.string.total_balance), // Consider moving this to R.string.total_balance too!
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "${if (user.totalAmount >= 0) "+" else ""}${
-                                String.format(
-                                    "%.0f",
-                                    user.totalAmount
-                                )
-                            }",
+                            text = "${if (isOwedToMe) "+" else "-"}$formattedAbsoluteAmount",
                             style = MaterialTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
-                            color = if (user.totalAmount >= 0) Success else MaterialTheme.colorScheme.error
+                            color = if (isOwedToMe) Success else MaterialTheme.colorScheme.error
                         )
                         Spacer(Modifier.height(4.dp))
+
                         Text(
-                            if (user.totalAmount >= 0) "${user.name} owes you" else "You owe ${user.name}",
+                            text = stringResource(
+                                id = translationResId,
+                                user.name,
+                                formattedAbsoluteAmount
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -327,7 +335,9 @@ fun DebtTransactionItem(
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    if (transaction.type == DebtTransactionType.GAVE) "I gave" else "I took",
+                    if (transaction.type == DebtTransactionType.GAVE) stringResource(R.string.i_gave) else stringResource(
+                        R.string.i_took
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.W500
                 )
@@ -343,10 +353,7 @@ fun DebtTransactionItem(
             }
             Text(
                 text = "${if (transaction.type == DebtTransactionType.GAVE) "-" else "+"}${
-                    String.format(
-                        "%.0f",
-                        transaction.amount
-                    )
+                    CurrencyFormatter.format(transaction.amount)
                 }",
                 style = MaterialTheme.typography.titleMedium.copy(
                     textDecoration = if (transaction.isPaid) TextDecoration.LineThrough else TextDecoration.None
@@ -405,7 +412,7 @@ fun DebtTransactionDialog(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    if (isEditing) "Edit Transaction" else "Add Transaction",
+                    if (isEditing) stringResource(R.string.edit_transaction) else stringResource(R.string.add_new_transaction),
                     fontWeight = FontWeight.Bold
                 )
                 IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, null) }
@@ -425,7 +432,7 @@ fun DebtTransactionDialog(
                             contentColor = if (transactionType == DebtTransactionType.GAVE) Color.White else MaterialTheme.colorScheme.primary
                         ),
                         contentPadding = PaddingValues(8.dp)
-                    ) { Text("I gave") }
+                    ) { Text(stringResource(R.string.i_gave)) }
                     Button(
                         onClick = { onTypeChange(DebtTransactionType.TOOK) },
                         modifier = Modifier.weight(1f),
@@ -437,11 +444,11 @@ fun DebtTransactionDialog(
                             contentColor = if (transactionType == DebtTransactionType.TOOK) Color.White else MaterialTheme.colorScheme.primary
                         ),
                         contentPadding = PaddingValues(8.dp)
-                    ) { Text("I took") }
+                    ) { Text(stringResource(R.string.i_took)) }
                 }
                 OutlinedTextField(
                     value = amount, onValueChange = onAmountChange,
-                    label = { Text("Amount") },
+                    label = { Text(stringResource(R.string.amount)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -449,7 +456,7 @@ fun DebtTransactionDialog(
                 )
                 OutlinedTextField(
                     value = note, onValueChange = onNoteChange,
-                    label = { Text("Note (optional)") },
+                    label = { Text(stringResource(R.string.note)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
@@ -464,7 +471,10 @@ fun DebtTransactionDialog(
                     .height(48.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text(if (isEditing) "Save" else "Add", fontWeight = FontWeight.Bold)
+                Text(
+                    if (isEditing) stringResource(R.string.save) else stringResource(R.string.add),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     )
