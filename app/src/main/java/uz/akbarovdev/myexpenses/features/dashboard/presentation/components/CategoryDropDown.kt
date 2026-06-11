@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.common_components.TextBox
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 
@@ -53,7 +54,7 @@ fun CategoryDropdown(
         // Selected Item View
         OutlinedTextField(
             readOnly = true,
-            value = if (selectedCategory != null) stringResource(selectedCategory.code) else "Select Category",
+            value = if (selectedCategory != null) stringResource(selectedCategory.code) else stringResource(R.string.select_category),
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier

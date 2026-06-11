@@ -70,7 +70,7 @@ fun DrawerNavigationRoot(
                 Spacer(Modifier.height(8.dp))
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     DrawerItem(
-                        label = "Dashboard",
+                        label = stringResource(R.string.dashboard),
                         icon = Icons.Default.Home,
                         isSelected = currentRoute?.contains("Dashboard") == true,
                         onClick = {
@@ -155,17 +155,11 @@ private fun AppDrawerHeader() {
     ) {
         Column {
             Text(
-                "Xarajatlar",
+                stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Spacer(Modifier.height(4.dp))
-//            Text(
-//                "My Expenses",
-//                style = MaterialTheme.typography.bodyMedium,
-//                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-//            )
         }
     }
 }

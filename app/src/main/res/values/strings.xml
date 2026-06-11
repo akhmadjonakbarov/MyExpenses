@@ -62,11 +62,31 @@
     <string name="phone_number">Telefon raqam (ixtiyoriy)</string>
     <string name="i_gave">Men berdim</string>
     <string name="i_took">Men oldim</string>
-    <string name="you_owe">Sen %1$s dan qarzdorsan</string>
-    <string name="owes_you">%1$s sendan qarzdor</string>
+    <string name="you_owe">Siz %1$s ga %2$s qarzdorsiz</string>
+    <string name="owes_you">%1$s sizga %2$s qarzdor</string>
     <string name="total_balance">Jami hisob</string>
     <string name="amount">Miqdori</string>
     <string name="currency_is_selected">Valyuta tanlandi</string>
     <string name="language_is_selected">Til tanlandi</string>
+
+    <string name="dashboard">Bosh sahifa</string>
+    <string name="delete_user">Foydalanuvchini o\'chirish</string>
+    <string name="confirm_delete_user">Siz %s ni o\'chirishni istaysizmi?</string>
+    <string name="confirm_delete_debt_transaction">Ishonchingiz komilmi?</string>
+    <string name="confirm_payment_title">To\'lovni tasdiqlash</string>
+    <string name="confirm_payment_message">To\'lovni tasdiqlaysizmi?</string>
+    <string name="confirm">Tasdiqlash</string>
+    <string name="paid">To\'langan</string>
+    <string name="export_title">Yuklab olish</string>
+    <string name="export_description">Hisobotlarni CSV formatida yuklab oling</string>
+    <string name="preference_setup_title">Sozlamalarni\no\'rnating</string>
+    <string name="preference_setup_description">Istalgan vaqtda Sozlamalar bo\'limida o\'zgartirishingiz mumkin</string>
+    <string name="username">foydalanuvchi</string>
+    <string name="menu_description">Menyu</string>
+    <string name="download_description">Yuklab olish</string>
+    <string name="close_icon_description">Yopish</string>
+    <string name="debt_details">Qarz tafsilotlari</string>
+    <string name="more_categories">+%d ta ko\'proq</string>
+    <string name="select_category">Kategoriyani tanlang</string>
 
 </resources>

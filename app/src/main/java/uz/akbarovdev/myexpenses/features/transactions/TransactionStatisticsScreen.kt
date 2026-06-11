@@ -324,7 +324,7 @@ private fun CategoryDonutChart(
                         }
                         if (categoryTotals.size > 6) {
                             Text(
-                                text = "+${categoryTotals.size - 6} more",
+                                text = stringResource(R.string.more_categories, categoryTotals.size - 6),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = onSurfaceVariant,
                             )

@@ -228,13 +228,13 @@ fun DashboardScreen(
                     Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        "Export",
+                        stringResource(R.string.export_title),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.W600,
                         )
                     )
                     Text(
-                        "Export transactions to CSV format",
+                        stringResource(R.string.export_description),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.W400,
                         )

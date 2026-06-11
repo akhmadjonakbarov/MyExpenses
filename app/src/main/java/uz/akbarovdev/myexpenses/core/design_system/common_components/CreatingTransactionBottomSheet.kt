@@ -94,7 +94,7 @@ fun CreatingTransactionBottomSheet(
                 onClick = onDismiss,
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close, contentDescription = "Close Icon",
+                    imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.close_icon_description),
                 )
             }
         }

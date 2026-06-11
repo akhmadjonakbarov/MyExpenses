@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.core.constants.PrefKeys
 import uz.akbarovdev.myexpenses.core.extension.sharedPreferences
-import uz.akbarovdev.myexpenses.features.preference.domain.models.LanguageUi
 
 class PreferenceViewModel(
     val applicationContext: Context
@@ -50,12 +49,13 @@ class PreferenceViewModel(
     private fun selectLanguage(languageCode: String) {
         language = languageCode
         viewModelScope.launch {
-            eventChannel.send(PreferenceEvents.LanguageSelected)
+            eventChannel.send(PreferenceEvents.LanguageSelected(languageCode))
         }
     }
 
     private fun selectCurrency(currencyCode: String) {
         symbolOfMoney = currencyCode
+
         viewModelScope.launch {
             eventChannel.send(PreferenceEvents.CurrencySelected)
         }

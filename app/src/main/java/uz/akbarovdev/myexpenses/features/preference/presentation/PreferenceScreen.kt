@@ -1,6 +1,6 @@
 package uz.akbarovdev.myexpenses.features.preference.presentation
 
-import android.content.Intent
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -29,6 +30,7 @@ import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.design_system.buttons.BackButton
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
+import uz.akbarovdev.myexpenses.core.extension.AppLocale
 import uz.akbarovdev.myexpenses.features.preference.presentation.components.CurrencyDropDownMenu
 import uz.akbarovdev.myexpenses.features.preference.presentation.components.LanguageDropDownMenu
 import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceAction
@@ -37,6 +39,7 @@ import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.Pref
 import uz.akbarovdev.myexpenses.features.preference.presentation.view_model.PreferenceViewModel
 import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 
+@SuppressLint("ContextCastToActivity")
 @Composable
 fun PreferenceRoot(
     navController: NavController,
@@ -60,17 +63,7 @@ fun PreferenceRoot(
                 is PreferenceEvents.LanguageSelected -> {
                     val message = context.getString(R.string.language_is_selected)
                     snackBarHostState.showSnackbar(message)
-                    val packageManager = context.packageManager
-                    val intent = packageManager.getLaunchIntentForPackage(context.packageName)
-
-                    if (intent != null) {
-                        // 2. Clear the entire task stack so the app starts completely fresh
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        context.startActivity(intent)
-
-                        // 3. Optional: Kill the current process to ensure a brutal/clean reset
-                        Runtime.getRuntime().exit(0)
-                    }
+                    AppLocale.switchTo(event.code, context)
                 }
             }
         }
@@ -121,7 +114,7 @@ fun PreferenceScreen(
         ) {
             if (isInitial) Column {
                 Text(
-                    "Set SpendLess\n" + "to your preferences",
+                    stringResource(R.string.preference_setup_title),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.W600,
                     ),
@@ -130,7 +123,7 @@ fun PreferenceScreen(
                     Modifier.height(8.dp)
                 )
                 Text(
-                    "You can change it at any time in Settings",
+                    stringResource(R.string.preference_setup_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

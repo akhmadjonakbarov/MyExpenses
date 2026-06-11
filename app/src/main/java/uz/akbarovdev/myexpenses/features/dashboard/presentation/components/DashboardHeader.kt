@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -37,12 +38,12 @@ fun DashboardHeader(
         IconButton(onClick = { scope.launch { drawerState.open() } }) {
             Icon(
                 Icons.Default.Menu,
-                contentDescription = "Menu",
+                contentDescription = stringResource(R.string.menu_description),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }
         Text(
-            "username",
+            stringResource(R.string.username),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onPrimary
         )
@@ -51,7 +52,7 @@ fun DashboardHeader(
         ) {
             PrimaryIconButton(
                 imageVector = ImageVector.vectorResource(R.drawable.download_icon),
-                contentDescription = "Download",
+                contentDescription = stringResource(R.string.download_description),
                 onClick = exportClick,
             )
 

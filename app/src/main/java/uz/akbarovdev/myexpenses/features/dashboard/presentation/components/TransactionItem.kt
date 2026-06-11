@@ -304,7 +304,7 @@ fun DeletableTransactionItem(
                             showEditDialog = false
                         },
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Close Icon")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close_icon_description))
                     }
                 }
             },
@@ -392,7 +392,7 @@ fun DeletableTransactionItem(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = iconColor,
                     modifier = Modifier.size(28.dp)
                 )
@@ -455,7 +455,7 @@ fun TransactionItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = transactionUi.icon.label,
+                    text = stringResource(transactionUi.icon.code),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

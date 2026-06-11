@@ -72,7 +72,7 @@ class DebtDetailViewModel(
                         id = e.id,
                         userId = e.userId,
                         amount = e.amount,
-                        type = if (e.type == "GAVE") DebtTransactionType.GAVE else DebtTransactionType.TOOK,
+                        type = if (e.type == DebtTransactionType.GAVE.name) DebtTransactionType.GAVE else DebtTransactionType.TOOK,
                         note = e.note ?: "",
                         isPaid = e.isPaid,
                         createdAt = e.createdAt
@@ -111,7 +111,7 @@ class DebtDetailViewModel(
                 )
             } else {
                 val user = debtRepository.getUserById(currentUserId) ?: return@launch
-                val diff = if (type == "GAVE") amount else -amount
+                val diff = if (type == DebtTransactionType.GAVE.name) amount else -amount
                 debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
                 debtRepository.insertTransaction(
                     DebtTransactionEntity(

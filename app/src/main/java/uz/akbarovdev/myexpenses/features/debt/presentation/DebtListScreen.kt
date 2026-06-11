@@ -159,7 +159,7 @@ fun DebtListScreen(
             },
             title = {
                 Text(
-                    "Delete User",
+                    stringResource(R.string.delete_user),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
@@ -167,7 +167,7 @@ fun DebtListScreen(
             },
             text = {
                 Text(
-                    "Are you sure you want to delete ${state.userToDelete.name}?",
+                    stringResource(R.string.confirm_delete_user, state.userToDelete.name),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -178,7 +178,7 @@ fun DebtListScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Delete", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.delete), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -186,7 +186,7 @@ fun DebtListScreen(
                     onClick = { onAction(DebtListAction.OnDismissDelete) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.outline)
+                    Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.outline)
                 }
             },
             shape = RoundedCornerShape(28.dp),

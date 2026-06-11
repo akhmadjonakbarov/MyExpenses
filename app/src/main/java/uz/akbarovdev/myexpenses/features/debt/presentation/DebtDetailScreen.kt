@@ -101,7 +101,7 @@ fun DebtDetailScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
-                title = { Title(title = state.user?.name ?: "Debt Details") }
+                title = { Title(title = state.user?.name ?: stringResource(R.string.debt_details)) }
             )
         },
         floatingActionButton = {
@@ -217,7 +217,7 @@ fun DebtDetailScreen(
             },
             title = {
                 Text(
-                    "Delete Transaction",
+                    stringResource(R.string.delete_transaction),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
@@ -225,7 +225,7 @@ fun DebtDetailScreen(
             },
             text = {
                 Text(
-                    "Are you sure?",
+                    stringResource(R.string.confirm_delete_debt_transaction),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -236,7 +236,7 @@ fun DebtDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Delete", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.delete), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -244,7 +244,7 @@ fun DebtDetailScreen(
                     onClick = { onAction(DebtDetailAction.OnDismissDelete) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.outline)
+                    Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.outline)
                 }
             },
             shape = RoundedCornerShape(28.dp),
@@ -265,7 +265,7 @@ fun DebtDetailScreen(
             },
             title = {
                 Text(
-                    "Confirm Payment",
+                    stringResource(R.string.confirm_payment_title),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
@@ -273,7 +273,7 @@ fun DebtDetailScreen(
             },
             text = {
                 Text(
-                    "Do you confirm this payment?",
+                    stringResource(R.string.confirm_payment_message),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -284,7 +284,7 @@ fun DebtDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Confirm", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.confirm), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -292,7 +292,7 @@ fun DebtDetailScreen(
                     onClick = { onAction(DebtDetailAction.OnDismissPay) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.outline)
+                    Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.outline)
                 }
             },
             shape = RoundedCornerShape(28.dp),
@@ -364,7 +364,7 @@ fun DebtTransactionItem(
             )
             if (transaction.isPaid) {
                 Text(
-                    "Paid",
+                    stringResource(R.string.paid),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp)

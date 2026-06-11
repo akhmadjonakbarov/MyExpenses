@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.core.enums.TransactionType
 import uz.akbarovdev.myexpenses.core.formatters.CurrencyFormatter
+import uz.akbarovdev.myexpenses.core.formatters.DateFormatter
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.CategoryUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model.DashboardState
@@ -95,11 +96,11 @@ fun TransactionInfo(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Largest transaction",
+                        stringResource(R.string.largest_transaction),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Text(
-                        "Jan 7, 2025",
+                        state.largestTransactionUi?.createdAt ?: "",
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }

@@ -4,12 +4,9 @@ import java.text.NumberFormat
 import java.util.Locale
 
 object CurrencyFormatter {
-    private val numberInstance = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
-//        minimumFractionDigits = 2
-        maximumFractionDigits = 3
-    }
-
     fun format(amount: Double?): String {
-        return numberInstance.format(amount ?: 0.0)
+        return NumberFormat.getNumberInstance(Locale.getDefault()).apply {
+            maximumFractionDigits = 3
+        }.format(amount ?: 0.0)
     }
 }
