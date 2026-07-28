@@ -57,6 +57,7 @@ class DebtDetailViewModel(
             }
             DebtDetailAction.OnConfirmPay -> payTransaction()
             DebtDetailAction.OnDismissPay -> _state.update { it.copy(showPayConfirm = false, payingTransaction = null) }
+            DebtDetailAction.DismissError -> _state.update { it.copy(error = null) }
         }
     }
 
@@ -64,94 +65,124 @@ class DebtDetailViewModel(
 
     private fun loadData(userId: Int) {
         currentUserId = userId
-        loadUser()
         viewModelScope.launch {
-            debtRepository.getTransactionsByUserId(userId).collect { entities ->
-                _state.update { it.copy(transactions = entities.map { e ->
-                    DebtTransactionUi(
-                        id = e.id,
-                        userId = e.userId,
-                        amount = e.amount,
-                        type = if (e.type == DebtTransactionType.GAVE.name) DebtTransactionType.GAVE else DebtTransactionType.TOOK,
-                        note = e.note ?: "",
-                        isPaid = e.isPaid,
-                        createdAt = e.createdAt
-                    )
-                })}
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                loadUser()
+                debtRepository.getTransactionsByUserId(userId).collect { entities ->
+                    _state.update { it.copy(transactions = entities.map { e ->
+                        DebtTransactionUi(
+                            id = e.id,
+                            userId = e.userId,
+                            amount = e.amount,
+                            type = if (e.type == DebtTransactionType.GAVE.name) DebtTransactionType.GAVE else DebtTransactionType.TOOK,
+                            note = e.note ?: "",
+                            isPaid = e.isPaid,
+                            createdAt = e.createdAt
+                        )
+                    }, isLoading = false)}
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Load failed", isLoading = false) }
             }
         }
     }
 
     private fun loadUser() {
         viewModelScope.launch {
-            val entity = debtRepository.getUserById(currentUserId) ?: return@launch
-            _state.update { it.copy(user = DebtUserUi(entity.id, entity.name, entity.phone ?: "", entity.totalAmount, entity.createdAt)) }
+            try {
+                val entity = debtRepository.getUserById(currentUserId) ?: return@launch
+                _state.update { it.copy(user = DebtUserUi(entity.id, entity.name, entity.phone ?: "", entity.totalAmount, entity.createdAt)) }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Load user failed") }
+            }
         }
     }
 
     private fun saveTransaction() {
         viewModelScope.launch {
-            val s = _state.value
-            val amount = s.amountInput.toDoubleOrNull() ?: return@launch
-            val type = s.transactionType.name
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val s = _state.value
+                val amount = s.amountInput.toDoubleOrNull() ?: return@launch
+                val type = s.transactionType.name
 
-            val existing = s.editingTransaction
-            if (existing != null) {
-                val oldEntity = debtRepository.getUserById(currentUserId) ?: return@launch
-                val oldAmountDiff = if (existing.type == DebtTransactionType.GAVE) existing.amount else -existing.amount
-                val newAmountDiff = if (s.transactionType == DebtTransactionType.GAVE) amount else -amount
-                val updatedTotal = oldEntity.totalAmount - oldAmountDiff + newAmountDiff
+                val existing = s.editingTransaction
+                if (existing != null) {
+                    val oldEntity = debtRepository.getUserById(currentUserId) ?: return@launch
+                    val oldAmountDiff = if (existing.type == DebtTransactionType.GAVE) existing.amount else -existing.amount
+                    val newAmountDiff = if (s.transactionType == DebtTransactionType.GAVE) amount else -amount
+                    val updatedTotal = oldEntity.totalAmount - oldAmountDiff + newAmountDiff
 
-                debtRepository.updateUser(oldEntity.copy(totalAmount = updatedTotal))
-                debtRepository.updateTransaction(
-                    DebtTransactionEntity(
-                        id = existing.id, userId = currentUserId, amount = amount, type = type,
-                        note = s.noteInput.trim().ifEmpty { null }, isPaid = existing.isPaid
+                    debtRepository.updateUser(oldEntity.copy(totalAmount = updatedTotal))
+                    debtRepository.updateTransaction(
+                        DebtTransactionEntity(
+                            id = existing.id, userId = currentUserId, amount = amount, type = type,
+                            note = s.noteInput.trim().ifEmpty { null }, isPaid = existing.isPaid
+                        )
                     )
-                )
-            } else {
-                val user = debtRepository.getUserById(currentUserId) ?: return@launch
-                val diff = if (type == DebtTransactionType.GAVE.name) amount else -amount
-                debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
-                debtRepository.insertTransaction(
-                    DebtTransactionEntity(
-                        userId = currentUserId, amount = amount, type = type,
-                        note = s.noteInput.trim().ifEmpty { null }
+                } else {
+                    val user = debtRepository.getUserById(currentUserId) ?: return@launch
+                    val diff = if (type == DebtTransactionType.GAVE.name) amount else -amount
+                    debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
+                    debtRepository.insertTransaction(
+                        DebtTransactionEntity(
+                            userId = currentUserId, amount = amount, type = type,
+                            note = s.noteInput.trim().ifEmpty { null }
+                        )
                     )
-                )
+                }
+                _state.update { it.copy(showAddDialog = false, editingTransaction = null) }
+                loadUser()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Save failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
-            _state.update { it.copy(showAddDialog = false, editingTransaction = null) }
-            loadUser()
         }
     }
 
     private fun deleteTransaction() {
         viewModelScope.launch {
-            val t = _state.value.transactionToDelete ?: return@launch
-            val user = debtRepository.getUserById(currentUserId) ?: return@launch
-            val diff = if (t.type == DebtTransactionType.GAVE) -t.amount else t.amount
-            debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
-            debtRepository.deleteTransaction(
-                DebtTransactionEntity(id = t.id, userId = currentUserId, amount = t.amount, type = t.type.name)
-            )
-            _state.update { it.copy(transactionToDelete = null) }
-            loadUser()
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val t = _state.value.transactionToDelete ?: return@launch
+                val user = debtRepository.getUserById(currentUserId) ?: return@launch
+                val diff = if (t.type == DebtTransactionType.GAVE) -t.amount else t.amount
+                debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
+                debtRepository.deleteTransaction(
+                    DebtTransactionEntity(id = t.id, userId = currentUserId, amount = t.amount, type = t.type.name)
+                )
+                _state.update { it.copy(transactionToDelete = null) }
+                loadUser()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Delete failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     private fun payTransaction() {
         viewModelScope.launch {
-            val t = _state.value.payingTransaction ?: return@launch
-            if (t.isPaid) return@launch
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val t = _state.value.payingTransaction ?: return@launch
+                if (t.isPaid) return@launch
 
-            val user = debtRepository.getUserById(currentUserId) ?: return@launch
-            val diff = if (t.type == DebtTransactionType.GAVE) -t.amount else t.amount
-            debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
-            debtRepository.updateTransaction(
-                DebtTransactionEntity(id = t.id, userId = currentUserId, amount = t.amount, type = t.type.name, isPaid = true)
-            )
-            _state.update { it.copy(showPayConfirm = false, payingTransaction = null) }
-            loadUser()
+                val user = debtRepository.getUserById(currentUserId) ?: return@launch
+                val diff = if (t.type == DebtTransactionType.GAVE) -t.amount else t.amount
+                debtRepository.updateUser(user.copy(totalAmount = user.totalAmount + diff))
+                debtRepository.updateTransaction(
+                    DebtTransactionEntity(id = t.id, userId = currentUserId, amount = t.amount, type = t.type.name, isPaid = true)
+                )
+                _state.update { it.copy(showPayConfirm = false, payingTransaction = null) }
+                loadUser()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Pay failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 }

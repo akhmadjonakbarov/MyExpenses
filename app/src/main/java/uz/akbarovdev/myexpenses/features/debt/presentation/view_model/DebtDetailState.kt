@@ -5,6 +5,8 @@ import uz.akbarovdev.myexpenses.features.debt.domain.models.DebtTransactionUi
 import uz.akbarovdev.myexpenses.features.debt.domain.models.DebtUserUi
 
 data class DebtDetailState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
     val user: DebtUserUi? = null,
     val transactions: List<DebtTransactionUi> = emptyList(),
     val showAddDialog: Boolean = false,

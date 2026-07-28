@@ -1,21 +1,63 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Kotlin Serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keep,includedescriptorclasses class uz.akbarovdev.myexpenses.**$$serializer { *; }
+-keepclassmembers class uz.akbarovdev.myexpenses.** {
+    *** Companion;
+}
+-keepclasseswithmembers class uz.akbarovdev.myexpenses.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Room
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Koin
+-keepclassmembers class * {
+    @org.koin.core.annotation.KoinInternalApi *;
+}
+-keep class org.koin.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Retrofit / OkHttp
+-keepattributes Signature
+-keepattributes Exceptions
+-keep class retrofit2.** { *; }
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn javax.annotation.**
+-dontwarn kotlin.Unit
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
+# Coil
+-keep class coil.** { *; }
+
+# Compose
+-keep class androidx.compose.** { *; }
+
+# Gson
+-keepattributes Signature
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Keep enum classes
+-keepclassmembers enum * { *; }
+
+# Keep custom entities for Room type converters
+-keep class uz.akbarovdev.myexpenses.features.dashboard.daos.** { *; }
+-keep class uz.akbarovdev.myexpenses.features.debt.daos.** { *; }
+
+# Keep ViewModels (reflection used by Koin)
+-keep class * : androidx.lifecycle.ViewModel { *; }

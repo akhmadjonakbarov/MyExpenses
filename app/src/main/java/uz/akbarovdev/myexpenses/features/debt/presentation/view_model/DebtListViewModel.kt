@@ -25,8 +25,13 @@ class DebtListViewModel(
 
     private fun loadUsers() {
         viewModelScope.launch {
-            debtRepository.getAllUsers().collect { entities ->
-                _state.update { it.copy(users = entities.map { it.toUi() }) }
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                debtRepository.getAllUsers().collect { entities ->
+                    _state.update { it.copy(users = entities.map { it.toUi() }, isLoading = false) }
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Load failed", isLoading = false) }
             }
         }
     }
@@ -52,40 +57,55 @@ class DebtListViewModel(
             is DebtListAction.OnDeleteUser -> _state.update { it.copy(userToDelete = action.user) }
             DebtListAction.OnConfirmDelete -> deleteUser()
             DebtListAction.OnDismissDelete -> _state.update { it.copy(userToDelete = null) }
+            DebtListAction.DismissError -> _state.update { it.copy(error = null) }
         }
     }
 
     private fun saveUser() {
         viewModelScope.launch {
-            val s = _state.value
-            val name = s.nameInput.trim()
-            if (name.isEmpty()) return@launch
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val s = _state.value
+                val name = s.nameInput.trim()
+                if (name.isEmpty()) return@launch
 
-            val existing = s.editingUser
-            if (existing != null) {
-                debtRepository.updateUser(
-                    DebtUserEntity(
-                        id = existing.id,
-                        name = name,
-                        phone = s.phoneInput.trim().ifEmpty { null },
-                        totalAmount = existing.totalAmount,
-                        createdAt = existing.createdAt
+                val existing = s.editingUser
+                if (existing != null) {
+                    debtRepository.updateUser(
+                        DebtUserEntity(
+                            id = existing.id,
+                            name = name,
+                            phone = s.phoneInput.trim().ifEmpty { null },
+                            totalAmount = existing.totalAmount,
+                            createdAt = existing.createdAt
+                        )
                     )
-                )
-            } else {
-                debtRepository.insertUser(
-                    DebtUserEntity(name = name, phone = s.phoneInput.trim().ifEmpty { null })
-                )
+                } else {
+                    debtRepository.insertUser(
+                        DebtUserEntity(name = name, phone = s.phoneInput.trim().ifEmpty { null })
+                    )
+                }
+                _state.update { it.copy(showCreateDialog = false, editingUser = null) }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Save failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
-            _state.update { it.copy(showCreateDialog = false, editingUser = null) }
         }
     }
 
     private fun deleteUser() {
         viewModelScope.launch {
-            val user = _state.value.userToDelete ?: return@launch
-            debtRepository.deleteUser(DebtUserEntity(id = user.id, name = user.name))
-            _state.update { it.copy(userToDelete = null) }
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val user = _state.value.userToDelete ?: return@launch
+                debtRepository.deleteUser(DebtUserEntity(id = user.id, name = user.name))
+                _state.update { it.copy(userToDelete = null) }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Delete failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 

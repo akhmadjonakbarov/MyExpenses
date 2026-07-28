@@ -19,4 +19,5 @@ sealed interface DebtDetailAction {
     data class OnPayTransaction(val transaction: DebtTransactionUi) : DebtDetailAction
     data object OnConfirmPay : DebtDetailAction
     data object OnDismissPay : DebtDetailAction
+    data object DismissError : DebtDetailAction
 }

@@ -8,6 +8,8 @@ import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 
 data class DashboardState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
     val manageCreatingTransactionBottomSheet: Boolean = false,
     val transactionType: TransactionType = TransactionType.Expense,
     val receiverText: String = "",
@@ -28,5 +30,4 @@ data class DashboardState(
     val editingTransaction: TransactionUi? = null,
     val dailyTransactions: List<TransactionUi> = emptyList(),
     val dailyTotal: Double = 0.0
-
 )

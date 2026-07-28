@@ -3,7 +3,7 @@ package uz.akbarovdev.myexpenses.core.extension
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
-import uz.cyberbro.avangardmss.core.databases.SharedPreferencesDelegate
+import uz.akbarovdev.myexpenses.core.databases.SharedPreferencesDelegate
 import java.util.Locale
 
 

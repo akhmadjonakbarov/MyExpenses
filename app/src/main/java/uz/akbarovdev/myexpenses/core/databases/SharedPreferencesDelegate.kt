@@ -1,4 +1,4 @@
-package uz.cyberbro.avangardmss.core.databases
+package uz.akbarovdev.myexpenses.core.databases
 
 import android.content.Context
 import kotlin.properties.ReadWriteProperty

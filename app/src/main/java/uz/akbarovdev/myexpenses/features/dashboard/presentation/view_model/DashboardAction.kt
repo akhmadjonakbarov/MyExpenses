@@ -24,6 +24,7 @@ sealed interface DashboardAction {
 
     data class OnManageDeleteConfirmTransaction(val value: Boolean) : DashboardAction
     data object OnEditTransaction : DashboardAction
+    data object DismissError : DashboardAction
 
 
 }

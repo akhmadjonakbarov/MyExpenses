@@ -137,30 +137,45 @@ class DashboardViewModel(
                     action.categoryUi
                 )
             }
+            DashboardAction.DismissError -> _state.update { it.copy(error = null) }
         }
     }
 
 
     private fun exportToExcel() {
         viewModelScope.launch {
-            val transactions = transactionRepository.getTransactions()
-            eventChannel.send(DashboardEvents.OnExportTransactionsDone)
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val transactions = transactionRepository.getTransactions()
+                eventChannel.send(DashboardEvents.OnExportTransactionsDone)
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Export failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     private fun initialization() {
         val symbolOfCurrency by applicationContext.sharedPreferences(PrefKeys.CURRENCY_SYMBOL)
         viewModelScope.launch {
-            getBalances()
-            getTransactions()
-            _state.update {
-                it.copy(selectedCurrencyUi = CurrencyUi.entries.find { currency -> currency.code == symbolOfCurrency }
-                    ?: CurrencyUi.UZS)
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                getBalances()
+                getTransactions()
+                _state.update {
+                    it.copy(selectedCurrencyUi = CurrencyUi.entries.find { currency -> currency.code == symbolOfCurrency }
+                        ?: CurrencyUi.UZS)
+                }
+                findLargestTransaction()
+                calculateWeeklyTransaction()
+                getDailyTransactions()
+                getTransactionsGroup()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Unknown error") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
-            findLargestTransaction()
-            calculateWeeklyTransaction()
-            getDailyTransactions()
-            getTransactionsGroup()
         }
     }
 
@@ -244,105 +259,116 @@ class DashboardViewModel(
 
     private fun editTransaction() {
         viewModelScope.launch {
-            val currentState = state.value
-            val editingTransaction = currentState.editingTransaction ?: return@launch
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val currentState = state.value
+                val editingTransaction = currentState.editingTransaction ?: return@launch
 
-            val newAmount = currentState.amountText.toDoubleOrNull() ?: 0.0
-            val oldAmount = editingTransaction.amount
+                val newAmount = currentState.amountText.toDoubleOrNull() ?: 0.0
+                val oldAmount = editingTransaction.amount
 
-            val balance = getLastBalance()
+                val balance = getLastBalance()
 
-            val balanceDifference = if (editingTransaction.type == TransactionType.Income) {
-                newAmount - oldAmount
-            } else {
-                oldAmount - newAmount
-            }
+                val balanceDifference = if (editingTransaction.type == TransactionType.Income) {
+                    newAmount - oldAmount
+                } else {
+                    oldAmount - newAmount
+                }
 
-            balanceRepository.insertBalance(
-                balance.copy(amount = balance.amount + balanceDifference)
-            )
+                balanceRepository.insertBalance(
+                    balance.copy(amount = balance.amount + balanceDifference)
+                )
 
-            val updatedTransaction = TransactionEntity(
-                id = editingTransaction.id,
-                amount = newAmount,
-                note = currentState.noteText,
-                receiver = currentState.receiverText,
-                type = currentState.transactionType.name,
-                category = currentState.selectedCategoryUi?.name
-            )
+                val updatedTransaction = TransactionEntity(
+                    id = editingTransaction.id,
+                    amount = newAmount,
+                    note = currentState.noteText,
+                    receiver = currentState.receiverText,
+                    type = currentState.transactionType.name,
+                    category = currentState.selectedCategoryUi?.name
+                )
 
-            transactionRepository.createTransaction(updatedTransaction)
+                transactionRepository.createTransaction(updatedTransaction)
 
-            _state.update {
-                it.copy(
-                    amountText = "",
-                    noteText = "",
-                    receiverText = "",
-                    selectedCategoryUi = null,
-                    editingTransaction = null,
-
+                _state.update {
+                    it.copy(
+                        amountText = "",
+                        noteText = "",
+                        receiverText = "",
+                        selectedCategoryUi = null,
+                        editingTransaction = null,
                     )
+                }
+                initialization()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Edit failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
-            initialization()
         }
     }
 
 
     private fun createTransaction() {
-
         viewModelScope.launch {
-            val currentState = state.value
-            val amount = currentState.amountText.toDoubleOrNull() ?: 0.0
-            val note = currentState.noteText
-            val receiver = currentState.receiverText
-            val transactionType = currentState.transactionType
-            val selectedCategory = currentState.selectedCategoryUi?.name
-            if (transactionType == TransactionType.Income) {
-                val balances = balanceRepository.getAllBalances()
-                if (balances.isNotEmpty()) {
-                    val lastBalance = getLastBalance()
-                    val updatedBalance = lastBalance.copy(
-                        amount = lastBalance.amount + amount
-                    )
-                    balanceRepository.insertBalance(updatedBalance)
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val currentState = state.value
+                val amount = currentState.amountText.toDoubleOrNull() ?: 0.0
+                val note = currentState.noteText
+                val receiver = currentState.receiverText
+                val transactionType = currentState.transactionType
+                val selectedCategory = currentState.selectedCategoryUi?.name
+                if (transactionType == TransactionType.Income) {
+                    val balances = balanceRepository.getAllBalances()
+                    if (balances.isNotEmpty()) {
+                        val lastBalance = getLastBalance()
+                        val updatedBalance = lastBalance.copy(
+                            amount = lastBalance.amount + amount
+                        )
+                        balanceRepository.insertBalance(updatedBalance)
+                    } else {
+                        val balance = BalanceEntity(
+                            amount = amount
+                        )
+                        balanceRepository.insertBalance(balance)
+                    }
                 } else {
-                    val balance = BalanceEntity(
-                        amount = amount
-                    )
-                    balanceRepository.insertBalance(balance)
+                    val balances = balanceRepository.getAllBalances()
+                    if (balances.isNotEmpty()) {
+                        val lastBalance = getLastBalance()
+                        val updatedBalance = lastBalance.copy(
+                            amount = lastBalance.amount - amount
+                        )
+                        balanceRepository.insertBalance(updatedBalance)
+                    }
                 }
-            } else {
-                val balances = balanceRepository.getAllBalances()
-                if (balances.isNotEmpty()) {
-                    val lastBalance = getLastBalance()
-                    val updatedBalance = lastBalance.copy(
-                        amount = lastBalance.amount - amount
-                    )
-                    balanceRepository.insertBalance(updatedBalance)
-                }
-            }
 
-            val transaction = TransactionEntity(
-                id = currentState.editingTransaction?.id ?: 0,
-                amount = amount,
-                note = note,
-                receiver = receiver,
-                type = transactionType.name,
-                category = selectedCategory
-            )
-            transactionRepository.createTransaction(transaction)
-
-            _state.update {
-                it.copy(
-                    amountText = "",
-                    noteText = "",
-                    receiverText = "",
-                    manageCreatingTransactionBottomSheet = false,
+                val transaction = TransactionEntity(
+                    id = currentState.editingTransaction?.id ?: 0,
+                    amount = amount,
+                    note = note,
+                    receiver = receiver,
+                    type = transactionType.name,
+                    category = selectedCategory
                 )
-            }
-            initialization()
-        }
+                transactionRepository.createTransaction(transaction)
 
+                _state.update {
+                    it.copy(
+                        amountText = "",
+                        noteText = "",
+                        receiverText = "",
+                        manageCreatingTransactionBottomSheet = false,
+                    )
+                }
+                initialization()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Create failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
+        }
     }
 
     private suspend fun getTransactions() {
@@ -377,34 +403,39 @@ class DashboardViewModel(
 
     private fun deleteTransaction(transactionUi: TransactionUi) {
         viewModelScope.launch {
-            val balance = getLastBalance()
+            _state.update { it.copy(isLoading = true, error = null) }
+            try {
+                val balance = getLastBalance()
 
-            val transactionEntity = TransactionEntity(
-                id = transactionUi.id,
-                amount = transactionUi.amount,
-                type = transactionUi.type.name,
-                note = transactionUi.note,
-                receiver = transactionUi.receiver,
-                category = transactionUi.icon.name
-            )
-            if (transactionUi.type == TransactionType.Income) {
-                balanceRepository.insertBalance(
-                    balance.copy(
-                        amount = balance.amount - transactionUi.amount
-                    )
+                val transactionEntity = TransactionEntity(
+                    id = transactionUi.id,
+                    amount = transactionUi.amount,
+                    type = transactionUi.type.name,
+                    note = transactionUi.note,
+                    receiver = transactionUi.receiver,
+                    category = transactionUi.icon.name
                 )
-            } else {
-                balanceRepository.insertBalance(
-                    balance.copy(
-                        amount = balance.amount + transactionUi.amount
+                if (transactionUi.type == TransactionType.Income) {
+                    balanceRepository.insertBalance(
+                        balance.copy(
+                            amount = balance.amount - transactionUi.amount
+                        )
                     )
-                )
+                } else {
+                    balanceRepository.insertBalance(
+                        balance.copy(
+                            amount = balance.amount + transactionUi.amount
+                        )
+                    )
+                }
+
+                transactionRepository.deleteTransaction(transactionEntity)
+                initialization()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Delete failed") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
-
-
-
-            transactionRepository.deleteTransaction(transactionEntity)
-            initialization()
         }
     }
 

@@ -13,4 +13,5 @@ sealed interface DebtListAction {
     data class OnDeleteUser(val user: DebtUserUi) : DebtListAction
     data object OnConfirmDelete : DebtListAction
     data object OnDismissDelete : DebtListAction
+    data object DismissError : DebtListAction
 }

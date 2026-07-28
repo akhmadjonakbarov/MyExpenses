@@ -26,10 +26,14 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(project.findProperty("MYAPP_UPLOAD_STORE_FILE") as String)
-            storePassword = project.findProperty("MYAPP_UPLOAD_STORE_PASSWORD") as String
-            keyAlias = project.findProperty("MYAPP_UPLOAD_KEY_ALIAS") as String
-            keyPassword = project.findProperty("MYAPP_UPLOAD_KEY_PASSWORD") as String
+            val storeFileProp = project.findProperty("MYAPP_UPLOAD_STORE_FILE") as? String
+            val storePassProp = project.findProperty("MYAPP_UPLOAD_STORE_PASSWORD") as? String
+            val keyAliasProp = project.findProperty("MYAPP_UPLOAD_KEY_ALIAS") as? String
+            val keyPassProp = project.findProperty("MYAPP_UPLOAD_KEY_PASSWORD") as? String
+            storeFile = storeFileProp?.let { file(it) } ?: file("keys/my_expenses.jks")
+            storePassword = System.getenv("MYAPP_UPLOAD_STORE_PASSWORD") ?: storePassProp ?: "my_expenses2026"
+            keyAlias = keyAliasProp ?: "my-expenses-key-alies"
+            keyPassword = System.getenv("MYAPP_UPLOAD_KEY_PASSWORD") ?: keyPassProp ?: "my_expenses2026"
         }
     }
     buildTypes {

@@ -24,35 +24,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import org.koin.androidx.compose.koinViewModel
 import uz.akbarovdev.myexpenses.R
 import uz.akbarovdev.myexpenses.app.navigation.NavigationRoutes
 import uz.akbarovdev.myexpenses.core.design_system.top_bar.Title
 import uz.akbarovdev.myexpenses.features.settings.components.MenuItem
-import uz.akbarovdev.myexpenses.features.settings.view_model.SettingsAction
-import uz.akbarovdev.myexpenses.features.settings.view_model.SettingsState
-import uz.akbarovdev.myexpenses.features.settings.view_model.SettingsViewModel
 import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 
 @Composable
 fun SettingsRoot(
     navController: NavController,
-    viewModel: SettingsViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     SettingsScreen(
-        state = state,
-        onAction = viewModel::onAction,
         navController = navController
     )
 }
@@ -61,8 +50,6 @@ fun SettingsRoot(
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    state: SettingsState,
-    onAction: (SettingsAction) -> Unit,
 ) {
 
     Scaffold(
@@ -157,8 +144,6 @@ fun SettingsScreen(
 private fun Preview() {
     MyExpensesTheme {
         SettingsScreen(
-            state = SettingsState(),
-            onAction = {},
             navController = rememberNavController()
         )
     }
