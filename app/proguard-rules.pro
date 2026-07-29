@@ -61,3 +61,10 @@
 
 # Keep ViewModels (reflection used by Koin)
 -keep class * : androidx.lifecycle.ViewModel { *; }
+
+# Firebase
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+-keepattributes *Annotation*
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**

@@ -41,6 +41,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.R
+import uz.akbarovdev.myexpenses.features.auth.AuthViewModel
 import uz.akbarovdev.myexpenses.features.dashboard.presentation.DashboardRoot
 import uz.akbarovdev.myexpenses.features.debt.presentation.DebtDetailRoot
 import uz.akbarovdev.myexpenses.features.debt.presentation.DebtListRoot
@@ -56,7 +57,8 @@ val LocalDrawerState = staticCompositionLocalOf<DrawerState> {
 @Composable
 fun DrawerNavigationRoot(
     navController: NavHostController,
-    drawerState: DrawerState
+    drawerState: DrawerState,
+    onLogout: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -122,7 +124,7 @@ fun DrawerNavigationRoot(
                     DashboardRoot(navController)
                 }
                 composable<NavigationRoutes.Settings> {
-                    SettingsRoot(navController)
+                    SettingsRoot(navController, onLogout = onLogout)
                 }
                 composable<NavigationRoutes.Transactions> {
                     TransactionsRoot(navController)

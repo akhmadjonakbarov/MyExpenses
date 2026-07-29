@@ -8,10 +8,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import uz.akbarovdev.myexpenses.app.navigation.DrawerNavigationRoot
 import uz.akbarovdev.myexpenses.core.constants.PrefKeys
 import uz.akbarovdev.myexpenses.core.extension.AppLocale
+import uz.akbarovdev.myexpenses.features.auth.AuthScreen
+import uz.akbarovdev.myexpenses.features.auth.AuthViewModel
 import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 import java.util.Locale
 
@@ -33,11 +38,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyExpensesTheme {
                 AppLocale.Wrapper {
-                    val drawerState = rememberDrawerState(DrawerValue.Closed)
-                    DrawerNavigationRoot(
-                        navController = rememberNavController(),
-                        drawerState = drawerState
-                    )
+                    val authViewModel = viewModel<AuthViewModel>()
+                    val authState by authViewModel.state.collectAsStateWithLifecycle()
+
+                    if (authState.isAuthenticated) {
+                        val drawerState = rememberDrawerState(DrawerValue.Closed)
+                        DrawerNavigationRoot(
+                            navController = rememberNavController(),
+                            drawerState = drawerState,
+                            onLogout = authViewModel::logout,
+                        )
+                    } else {
+                        AuthScreen(viewModel = authViewModel)
+                    }
                 }
             }
         }

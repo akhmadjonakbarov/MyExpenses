@@ -4,9 +4,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     id("de.mannodermaus.android-junit5") version "1.9.3.0"
-    kotlin("kapt")  // Apply Kotlin Kapt plugin
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20" // Replace with your Kotlin version
+    kotlin("kapt")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
 }
 
 android {
@@ -117,9 +119,14 @@ dependencies {
     // work manager
     implementation(libs.androidx.work.runtime.ktx)
 
+    // Firebase BoM
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
+    implementation(libs.google.auth)
+
     // JUnit Jupiter
-    testImplementation(libs.junit.jupiter.api) // Or the latest stable version
-    testRuntimeOnly(libs.junit.jupiter.engine) // Or the latest stable version
-    testImplementation(libs.junit.jupiter.params) // For parameterized tests (optional)
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.assertk)
 }

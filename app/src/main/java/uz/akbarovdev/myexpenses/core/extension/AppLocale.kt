@@ -1,10 +1,11 @@
 package uz.akbarovdev.myexpenses.core.extension
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +13,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
 import uz.akbarovdev.myexpenses.core.constants.PrefKeys
 import java.util.Locale
+
+private class LocaleContextWrapper(base: Context, locale: Locale) : ContextWrapper(base) {
+    private val localeResources: Resources by lazy {
+        val config = Configuration(base.resources.configuration)
+        config.setLocale(locale)
+        base.createConfigurationContext(config).resources
+    }
+
+    override fun getResources(): Resources = localeResources
+}
 
 object AppLocale {
     private const val DEFAULT_LANG = "uz"
@@ -34,9 +45,7 @@ object AppLocale {
 
     fun wrapContext(context: Context): Context {
         Locale.setDefault(locale)
-        val config = Configuration(context.resources.configuration)
-        config.setLocale(locale)
-        return context.createConfigurationContext(config)
+        return LocaleContextWrapper(context, locale)
     }
 
     @Composable

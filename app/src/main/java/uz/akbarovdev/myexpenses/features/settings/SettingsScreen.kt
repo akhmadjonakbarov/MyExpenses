@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -40,9 +41,11 @@ import uz.akbarovdev.myexpenses.ui.theme.MyExpensesTheme
 @Composable
 fun SettingsRoot(
     navController: NavController,
+    onLogout: () -> Unit = {},
 ) {
     SettingsScreen(
-        navController = navController
+        navController = navController,
+        onLogout = onLogout,
     )
 }
 
@@ -50,6 +53,7 @@ fun SettingsRoot(
 @Composable
 fun SettingsScreen(
     navController: NavController,
+    onLogout: () -> Unit = {},
 ) {
 
     Scaffold(
@@ -131,7 +135,7 @@ fun SettingsScreen(
                     text = stringResource(R.string.logout),
                     containerColor = MaterialTheme.colorScheme.error.copy(0.08f),
                     textColor = MaterialTheme.colorScheme.error,
-                    onClick = { navController.navigate(NavigationRoutes.Preference) }
+                    onClick = onLogout
                 )
             }
         }
