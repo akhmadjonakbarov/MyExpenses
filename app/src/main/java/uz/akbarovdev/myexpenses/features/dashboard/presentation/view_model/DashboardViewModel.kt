@@ -1,9 +1,13 @@
 package uz.akbarovdev.myexpenses.features.dashboard.presentation.view_model
 
 import android.content.Context
+import android.os.Bundle
 import android.text.format.DateUtils
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,12 +28,15 @@ import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionGrou
 import uz.akbarovdev.myexpenses.features.dashboard.domain.models.TransactionUi
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.BalanceRepository
 import uz.akbarovdev.myexpenses.features.dashboard.domain.repositories.TransactionRepository
+import uz.akbarovdev.myexpenses.features.dashboard.data.sync.CloudSyncRepository
 import uz.akbarovdev.myexpenses.features.preference.domain.models.CurrencyUi
 
 class DashboardViewModel(
     val transactionRepository: TransactionRepository,
     val balanceRepository: BalanceRepository,
-    val applicationContext: Context
+    val applicationContext: Context,
+    private val cloudSyncRepository: CloudSyncRepository,
+    private val firebaseAuth: FirebaseAuth,
 ) : ViewModel() {
 
     val eventChannel = Channel<DashboardEvents>()
@@ -164,8 +171,12 @@ class DashboardViewModel(
                 getBalances()
                 getTransactions()
                 _state.update {
-                    it.copy(selectedCurrencyUi = CurrencyUi.entries.find { currency -> currency.code == symbolOfCurrency }
-                        ?: CurrencyUi.UZS)
+                    it.copy(
+                        selectedCurrencyUi = CurrencyUi.entries.find { currency -> currency.code == symbolOfCurrency }
+                            ?: CurrencyUi.UZS,
+                        userName = firebaseAuth.currentUser?.displayName
+                            ?: firebaseAuth.currentUser?.email,
+                    )
                 }
                 findLargestTransaction()
                 calculateWeeklyTransaction()
@@ -290,6 +301,8 @@ class DashboardViewModel(
 
                 transactionRepository.createTransaction(updatedTransaction)
 
+                syncCloud()
+
                 _state.update {
                     it.copy(
                         amountText = "",
@@ -353,6 +366,15 @@ class DashboardViewModel(
                     category = selectedCategory
                 )
                 transactionRepository.createTransaction(transaction)
+
+                syncCloud()
+                FirebaseAnalytics.getInstance(applicationContext).logEvent(
+                    "transaction_created",
+                    Bundle().apply {
+                        putString("type", transactionType.name)
+                        putDouble("amount", amount)
+                    }
+                )
 
                 _state.update {
                     it.copy(
@@ -430,6 +452,7 @@ class DashboardViewModel(
                 }
 
                 transactionRepository.deleteTransaction(transactionEntity)
+                syncCloud()
                 initialization()
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message ?: "Delete failed") }
@@ -443,6 +466,11 @@ class DashboardViewModel(
     private suspend fun getLastBalance(): BalanceEntity {
         val balances = balanceRepository.getAllBalances()
         return balances.last()
+    }
+
+    private suspend fun syncCloud() {
+        runCatching { cloudSyncRepository.pushAllLocal() }
+            .onFailure { Log.w(TAG, "Cloud sync failed", it) }
     }
 
     private suspend fun findLargestTransaction() {

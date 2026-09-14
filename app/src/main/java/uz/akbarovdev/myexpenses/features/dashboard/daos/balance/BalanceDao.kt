@@ -13,8 +13,12 @@ interface BalanceDao {
     suspend fun getAllBalances(): List<BalanceEntity>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBalance(balance: BalanceEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBalances(balances: List<BalanceEntity>)
     @Delete
     suspend fun deleteBalance(balance: BalanceEntity)
+    @Query("DELETE FROM balances")
+    suspend fun clearAll()
 
 
 }

@@ -20,6 +20,7 @@
     <string name="clothes">Kiyimlar</string>
     <string name="confirm_delete">Siz bu hisobotni o\'chirishni istaysizmi?</string>
     <string name="logout">Chiqish</string>
+    <string name="logout_confirmation_message">Haqiqatan ham hisobingizdan chiqishni xohlaysizmi?</string>
     <string name="security">Xavfsizlik</string>
     <string name="settings">Sozlamalar</string>
     <string name="categories">Bo\'limlar</string>

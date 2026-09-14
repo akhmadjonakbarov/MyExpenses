@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import uz.akbarovdev.myexpenses.R
@@ -25,6 +26,7 @@ import uz.akbarovdev.myexpenses.core.design_system.buttons.PrimaryIconButton
 @Composable
 fun DashboardHeader(
     exportClick: () -> Unit,
+    userName: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val drawerState = LocalDrawerState.current
@@ -43,9 +45,11 @@ fun DashboardHeader(
             )
         }
         Text(
-            stringResource(R.string.username),
+            userName ?: stringResource(R.string.username),
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp)

@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "40600739006-6euqbkuuveo498pdgfd54smvokrc6kv1.apps.googleusercontent.com",
+          "client_id": "40600739006-56g5b31184an5buhc32mi47qbq4daf7o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "uz.akbarovdev.myexpenses",
-            "certificate_hash": "d7da9bca1d29bdd59a300753f61e3526814b5443"
+            "certificate_hash": "1b31055c6ba3166a0376f3df15e4d437beb58709"
           }
         },
         {

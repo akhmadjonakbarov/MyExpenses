@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
@@ -108,6 +109,15 @@ fun DrawerNavigationRoot(
                         isSelected = currentRoute?.contains("Settings") == true,
                         onClick = {
                             navController.navigate(NavigationRoutes.Settings)
+                            scope.launch { drawerState.close() }
+                        }
+                    )
+                    DrawerItem(
+                        label = stringResource(R.string.logout),
+                        icon = Icons.AutoMirrored.Filled.ExitToApp,
+                        isSelected = false,
+                        onClick = {
+                            onLogout()
                             scope.launch { drawerState.close() }
                         }
                     )

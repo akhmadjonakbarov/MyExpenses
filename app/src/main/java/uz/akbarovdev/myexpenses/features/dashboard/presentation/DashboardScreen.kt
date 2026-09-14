@@ -120,7 +120,7 @@ fun DashboardScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     DashboardHeader(
-
+                        userName = state.userName,
                         exportClick = {
                             onAction(DashboardAction.OnShowExportBottomSheet)
                         }

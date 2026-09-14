@@ -24,4 +24,9 @@ class TransactionRepositoryImpl(
     override suspend fun updateTransaction(transactionEntity: TransactionEntity) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun replaceAllTransactions(transactions: List<TransactionEntity>) {
+        transactionDao.clearAll()
+        transactionDao.insertTransactions(transactions)
+    }
 }

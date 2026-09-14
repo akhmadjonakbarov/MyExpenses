@@ -1,11 +1,15 @@
 package uz.akbarovdev.myexpenses.features.auth
 
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -15,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import uz.akbarovdev.myexpenses.features.dashboard.data.sync.CloudSyncRepository
 
 data class AuthUiState(
     val isLoading: Boolean = true,
@@ -26,30 +31,44 @@ data class AuthUiState(
     val confirmPassword: String = "",
     val displayName: String = "",
     val isRegisterMode: Boolean = false,
+    val showLogoutConfirmation: Boolean = false,
 )
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    private val cloudSyncRepository: CloudSyncRepository,
+    private val applicationContext: Context,
+) : ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val analytics: FirebaseAnalytics = FirebaseAnalytics.getInstance(applicationContext)
 
     private val _state = MutableStateFlow(AuthUiState())
     val state: StateFlow<AuthUiState> = _state.asStateFlow()
 
     init {
-        val currentUser = auth.currentUser
-        _state.value = AuthUiState(
-            isAuthenticated = currentUser != null,
-            isLoading = false,
-            userEmail = currentUser?.email,
-        )
-
         auth.addAuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
-            _state.update {
-                it.copy(
-                    isAuthenticated = user != null,
-                    userEmail = user?.email,
-                )
+            _state.update { it.copy(userEmail = user?.email) }
+            if (user != null && !_state.value.isAuthenticated) {
+                viewModelScope.launch {
+                    _state.update { it.copy(isLoading = true, error = null) }
+                    runCatching { cloudSyncRepository.pushAllLocal() }
+                        .onFailure { Log.e(TAG, "Cloud push failed", it) }
+                    runCatching { cloudSyncRepository.pullAllRemote() }
+                        .onFailure { Log.e(TAG, "Cloud pull failed", it) }
+                    analytics.logEvent(
+                        FirebaseAnalytics.Event.LOGIN,
+                        Bundle().apply {
+                            putString(
+                                FirebaseAnalytics.Param.METHOD,
+                                if (user.email != null) "password" else "google"
+                            )
+                        }
+                    )
+                    _state.update { it.copy(isLoading = false, isAuthenticated = true) }
+                }
+            } else if (user == null) {
+                _state.update { it.copy(isAuthenticated = false, isLoading = false) }
             }
         }
     }
@@ -95,6 +114,12 @@ class AuthViewModel : ViewModel() {
                 val result = auth.createUserWithEmailAndPassword(s.email, s.password).await()
                 val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(s.displayName).build()
                 result.user?.updateProfile(profileUpdates)?.await()
+                analytics.logEvent(
+                    FirebaseAnalytics.Event.SIGN_UP,
+                    Bundle().apply {
+                        putString(FirebaseAnalytics.Param.METHOD, "password")
+                    }
+                )
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.localizedMessage ?: "Registration failed") }
             } finally {
@@ -125,8 +150,22 @@ class AuthViewModel : ViewModel() {
         private const val TAG = "AuthViewModel"
     }
 
-    fun logout() {
-        auth.signOut()
+    fun requestLogout() = _state.update { it.copy(showLogoutConfirmation = true) }
+
+    fun dismissLogout() = _state.update { it.copy(showLogoutConfirmation = false) }
+
+    fun confirmLogout() {
+        viewModelScope.launch {
+            _state.update { it.copy(showLogoutConfirmation = false) }
+            runCatching { cloudSyncRepository.pushAllLocal() }
+            runCatching {
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+                GoogleSignIn.getClient(applicationContext, gso).signOut().await()
+            }
+            runCatching { cloudSyncRepository.clearLocalData() }
+            analytics.logEvent("logout", null)
+            auth.signOut()
+        }
     }
 
     private fun validate(email: String, password: String): Boolean {

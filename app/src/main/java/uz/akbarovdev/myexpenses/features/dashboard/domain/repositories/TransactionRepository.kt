@@ -8,4 +8,5 @@ interface TransactionRepository {
     suspend fun createTransaction(transactionEntity: TransactionEntity)
     suspend fun deleteTransaction(transactionEntity: TransactionEntity)
     suspend fun updateTransaction(transactionEntity: TransactionEntity)
+    suspend fun replaceAllTransactions(transactions: List<TransactionEntity>)
 }

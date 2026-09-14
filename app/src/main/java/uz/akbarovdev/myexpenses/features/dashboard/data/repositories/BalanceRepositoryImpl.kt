@@ -15,4 +15,9 @@ class BalanceRepositoryImpl(
         return balanceDao.getAllBalances()
     }
 
+    override suspend fun replaceAllBalances(balances: List<BalanceEntity>) {
+        balanceDao.clearAll()
+        balanceDao.insertBalances(balances)
+    }
+
 }
