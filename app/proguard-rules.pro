@@ -60,7 +60,7 @@
 -keep class uz.akbarovdev.myexpenses.features.debt.daos.** { *; }
 
 # Keep ViewModels (reflection used by Koin)
--keep class * : androidx.lifecycle.ViewModel { *; }
+-keep class * extends androidx.lifecycle.ViewModel { *; }
 
 # Firebase
 -keep class com.google.firebase.** { *; }

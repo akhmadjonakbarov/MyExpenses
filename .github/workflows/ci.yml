@@ -47,8 +47,8 @@ jobs:
           MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
           MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
 
-      - name: Upload release AAB
+      - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: app/build/outputs/bundle/release/app-release.aab
+          path: app/build/outputs/apk/release/app-release.apk

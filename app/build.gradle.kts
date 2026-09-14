@@ -129,5 +129,6 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.assertk)
 }
